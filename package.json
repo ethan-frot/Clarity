@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.4.0",
+    "bcryptjs": "^2.4.3",
     "next": "16.0.3",
     "react": "19.2.0",
     "react-dom": "19.2.0"
@@ -21,6 +22,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@testcontainers/postgresql": "^11.8.1",
+    "@types/bcryptjs": "^2.4.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
