@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "jest --watch",
+    "test:ci": "jest",
+    "test:unit": "jest --testPathIgnorePatterns=\"\\.e2e\\.spec\\.ts$\"",
+    "test:e2e": "jest --testPathPattern=\"\\.e2e\\.spec\\.ts$\""
   },
   "dependencies": {
     "@prisma/client": "^6.4.0",
