@@ -15,8 +15,8 @@ datasource db {
 }
 
 model Conversation {
-  id    String  @id @default(cuid())
-  title String?
+  id    String @id @default(cuid())
+  title String
 
   messages Message[]
 
