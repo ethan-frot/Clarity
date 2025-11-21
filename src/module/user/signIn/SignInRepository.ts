@@ -1,18 +1,18 @@
 import { User } from '@/domain/user/User';
 
 /**
- * Repository interface for SignIn use case
+ * Interface du repository pour le use case SignIn
  *
- * This interface follows the Dependency Inversion Principle:
- * - The use case depends on this interface (port), not on a concrete implementation
- * - The Prisma repository (adapter) will implement this interface
+ * Cette interface suit le principe d'inversion de dépendance :
+ * - Le use case dépend de cette interface (port), pas d'une implémentation concrète
+ * - Le repository Prisma (adapter) implémentera cette interface
  */
 export interface SignInRepository {
   /**
-   * Find a user by email address
+   * Recherche un utilisateur par son adresse email
    *
-   * @param email - The email address to search for
-   * @returns The User entity if found, null otherwise
+   * @param email - L'adresse email à rechercher
+   * @returns L'entité User si trouvée, null sinon
    */
   findByEmail(email: string): Promise<User | null>;
 }

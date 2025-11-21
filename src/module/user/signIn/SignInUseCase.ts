@@ -2,7 +2,7 @@ import { SignInRepository } from "./SignInRepository";
 import * as bcrypt from "bcryptjs";
 
 /**
- * Command object for SignIn use case
+ * Objet command pour le use case SignIn
  */
 export interface SignInCommand {
   email: string;
@@ -10,8 +10,8 @@ export interface SignInCommand {
 }
 
 /**
- * Result object for SignIn use case
- * Note: Password is NEVER returned for security reasons
+ * Objet résultat pour le use case SignIn
+ * Note : Le mot de passe n'est JAMAIS retourné pour des raisons de sécurité
  */
 export interface SignInResult {
   userId: string;
@@ -20,34 +20,36 @@ export interface SignInResult {
 }
 
 /**
- * Authenticates a user with email and password.
+ * Use Case : Connexion (Sign In) - US-10
  *
- * Business rules:
- * - Email and password are required
- * - Email must exist in database
- * - Password must match the hashed password (bcrypt comparison)
- * - Returns user info WITHOUT password
+ * Authentifie un utilisateur avec email et mot de passe.
  *
- * @throws Error if validation fails or credentials are incorrect
+ * Règles métier :
+ * - L'email et le mot de passe sont obligatoires
+ * - L'email doit exister en base de données
+ * - Le mot de passe doit correspondre au hash (comparaison bcrypt)
+ * - Retourne les infos utilisateur SANS le mot de passe
+ *
+ * @throws Error si la validation échoue ou si les identifiants sont incorrects
  */
 export class SignInUseCase {
   constructor(private repository: SignInRepository) {}
 
   async execute(command: SignInCommand): Promise<SignInResult> {
     try {
-      // 1. Validate inputs
+      // 1. Valider les entrées
       this.validateEmail(command.email);
       this.validatePassword(command.password);
 
-      // 2. Find user by email
+      // 2. Rechercher l'utilisateur par email
       const user = await this.repository.findByEmail(command.email);
 
       if (!user) {
-        // Security: Don't reveal if email exists or not
+        // Sécurité : Ne pas révéler si l'email existe ou non
         throw new Error("Email ou mot de passe incorrect");
       }
 
-      // 3. Verify password with bcrypt
+      // 3. Vérifier le mot de passe avec bcrypt
       const isPasswordValid = await bcrypt.compare(
         command.password,
         user.password
@@ -57,25 +59,25 @@ export class SignInUseCase {
         throw new Error("Email ou mot de passe incorrect");
       }
 
-      // 4. Return user info (WITHOUT password)
+      // 4. Retourner les infos utilisateur (SANS le mot de passe)
       return {
         userId: user.id!,
         email: user.email,
         name: user.name,
       };
     } catch (error) {
-      // Business errors: rethrow as-is
+      // Erreurs métier : relancer telles quelles
       if (error instanceof Error) {
         throw error;
       }
-      // Unexpected errors: wrap with context
+      // Erreurs inattendues : encapsuler avec contexte
       throw new Error("Impossible de se connecter");
     }
   }
 
   /**
-   * Validate email input
-   * @throws Error if email is invalid
+   * Valide l'entrée email
+   * @throws Error si l'email est invalide
    */
   private validateEmail(email: string): void {
     if (email === undefined || email === null) {
@@ -88,8 +90,8 @@ export class SignInUseCase {
   }
 
   /**
-   * Validate password input
-   * @throws Error if password is invalid
+   * Valide l'entrée mot de passe
+   * @throws Error si le mot de passe est invalide
    */
   private validatePassword(password: string): void {
     if (password === undefined || password === null) {
