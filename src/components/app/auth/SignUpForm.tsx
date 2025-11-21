@@ -4,10 +4,15 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Loader2, Mail, Lock, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  EmailInput,
+  PasswordInput,
+  NameInput,
+  EMAIL_VALIDATION,
+  PASSWORD_VALIDATION,
+  NAME_VALIDATION
+} from '@/components/app/common/form';
+import { GradientButton } from '@/components/app/common/GradientButton';
 
 interface SignUpFormData {
   email: string;
@@ -63,119 +68,35 @@ export function SignUpForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Champ Name (optionnel) */}
-      <div className="space-y-2">
-        <Label htmlFor="name" className="text-white/90">
-          Nom <span className="text-white/50 text-xs">(optionnel)</span>
-        </Label>
-        <div className="relative">
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
-          <Input
-            id="name"
-            type="text"
-            placeholder="Alice Dupont"
-            className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-blue-400/50 focus:ring-blue-400/20"
-            {...register('name', {
-              maxLength: {
-                value: 100,
-                message: 'Le nom ne peut pas dépasser 100 caractères',
-              },
-            })}
-            disabled={isLoading}
-          />
-        </div>
-        {errors.name && (
-          <p className="text-xs text-red-400">{errors.name.message}</p>
-        )}
-      </div>
+      <NameInput
+        error={errors.name?.message}
+        disabled={isLoading}
+        optional
+        {...register('name', NAME_VALIDATION)}
+      />
 
       {/* Champ Email */}
-      <div className="space-y-2">
-        <Label htmlFor="email" className="text-white/90">
-          Email
-        </Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
-          <Input
-            id="email"
-            type="email"
-            placeholder="alice@example.com"
-            className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-blue-400/50 focus:ring-blue-400/20"
-            {...register('email', {
-              required: 'L\'email est requis',
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: 'Format d\'email invalide',
-              },
-              maxLength: {
-                value: 255,
-                message: 'L\'email ne peut pas dépasser 255 caractères',
-              },
-            })}
-            disabled={isLoading}
-          />
-        </div>
-        {errors.email && (
-          <p className="text-xs text-red-400">{errors.email.message}</p>
-        )}
-      </div>
+      <EmailInput
+        error={errors.email?.message}
+        disabled={isLoading}
+        {...register('email', EMAIL_VALIDATION)}
+      />
 
       {/* Champ Password */}
-      <div className="space-y-2">
-        <Label htmlFor="password" className="text-white/90">
-          Mot de passe
-        </Label>
-        <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
-          <Input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-blue-400/50 focus:ring-blue-400/20"
-            {...register('password', {
-              required: 'Le mot de passe est requis',
-              minLength: {
-                value: 8,
-                message: 'Le mot de passe doit contenir au moins 8 caractères',
-              },
-              validate: {
-                hasUppercase: (value) =>
-                  /[A-Z]/.test(value) || 'Doit contenir au moins une majuscule',
-                hasLowercase: (value) =>
-                  /[a-z]/.test(value) || 'Doit contenir au moins une minuscule',
-                hasNumber: (value) =>
-                  /[0-9]/.test(value) || 'Doit contenir au moins un chiffre',
-                hasSpecial: (value) =>
-                  /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(value) ||
-                  'Doit contenir au moins un caractère spécial',
-              },
-            })}
-            disabled={isLoading}
-          />
-        </div>
-        {errors.password && (
-          <p className="text-xs text-red-400">{errors.password.message}</p>
-        )}
-        <p className="text-xs text-white/50">
-          Minimum 8 caractères avec majuscule, minuscule, chiffre et caractère spécial
-        </p>
-      </div>
+      <PasswordInput
+        error={errors.password?.message}
+        disabled={isLoading}
+        {...register('password', PASSWORD_VALIDATION)}
+      />
 
       {/* Bouton Submit */}
-      <Button
+      <GradientButton
         type="submit"
-        disabled={isLoading}
-        className="w-full cursor-pointer bg-linear-to-r from-blue-500/90 to-violet-600/90 hover:from-blue-500 hover:to-violet-600 text-white font-semibold shadow-md shadow-blue-500/10 transition-all duration-300 hover:shadow-blue-500/20 hover:scale-[1.01]"
-        size="lg"
+        isLoading={isLoading}
+        loadingText="Création en cours..."
       >
-        {isLoading ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Création en cours...
-          </>
-        ) : (
-          'Créer mon compte'
-        )}
-      </Button>
+        Créer mon compte
+      </GradientButton>
     </form>
   );
 }
