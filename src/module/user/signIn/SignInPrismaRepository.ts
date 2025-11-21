@@ -1,14 +1,31 @@
 import { prisma } from '@/lib/prisma';
 import { SignInRepository } from './SignInRepository';
 import { User } from '@/domain/user/User';
+import { PrismaClient } from '@/generated/prisma';
 
 /**
  * Adapter Prisma pour SignInRepository
  *
  * Implémente l'interface du repository en utilisant Prisma Client.
  * Convertit les modèles Prisma en entités du domaine.
+ *
+ * Injection de dépendance :
+ * - Accepte un PrismaClient optionnel via le constructeur
+ * - Utilise le singleton par défaut si aucun client n'est fourni
+ * - Permet l'utilisation d'un client de test pour les tests E2E
  */
 export class SignInPrismaRepository implements SignInRepository {
+  private prismaClient: PrismaClient;
+
+  /**
+   * Constructeur avec injection de dépendance
+   *
+   * @param prismaClient - Instance PrismaClient optionnelle (utilise le singleton par défaut)
+   */
+  constructor(prismaClient?: PrismaClient) {
+    this.prismaClient = prismaClient || prisma;
+  }
+
   /**
    * Recherche un utilisateur par son adresse email
    *
@@ -17,7 +34,7 @@ export class SignInPrismaRepository implements SignInRepository {
    */
   async findByEmail(email: string): Promise<User | null> {
     // Requête en base de données avec Prisma
-    const userData = await prisma.user.findUnique({
+    const userData = await this.prismaClient.user.findUnique({
       where: { email },
     });
 
