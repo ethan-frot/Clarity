@@ -1,5 +1,8 @@
 'use client';
 
+// Ce composant est côté client car il utilise React Hook Form (useState, useForm)
+// et nécessite des event handlers interactifs (onChange, onSubmit)
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
@@ -20,6 +23,17 @@ interface SignUpFormData {
   name?: string;
 }
 
+/**
+ * Formulaire d'inscription (US-9)
+ *
+ * Permet à un utilisateur de créer un nouveau compte.
+ * Après inscription réussie, redirige vers la page de connexion.
+ *
+ * Validation :
+ * - Email : format RFC 5322, max 255 caractères
+ * - Password : min 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre, 1 spécial
+ * - Name : optionnel, max 100 caractères
+ */
 export function SignUpForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +67,8 @@ export function SignUpForm() {
       // Succès
       toast.success('Compte créé avec succès');
 
-      // Redirection vers la page de connexion après un court délai
+      // Redirection différée pour laisser le temps à l'utilisateur de lire le toast
+      // UX : 1.5s est suffisant pour confirmer l'action sans ralentir le flow
       setTimeout(() => {
         router.push('/signin');
       }, 1500);

@@ -1,59 +1,28 @@
-/**
- * Tests Unitaires : RegisterUserUseCase (US-9)
- *
- * Ces tests vérifient la logique métier de l'inscription
- * en isolation, sans base de données ni HTTP.
- *
- * On utilise des test doubles (dummy repositories) qui implémentent
- * l'interface RegisterUserRepository.
- *
- * Scénarios testés (conformément aux specs) :
- * ✅ Inscription réussie avec nom
- * ✅ Inscription réussie sans nom
- * ❌ Inscription échouée - email déjà utilisé
- * ❌ Inscription échouée - email invalide
- * ❌ Inscription échouée - mot de passe trop court
- * ❌ Inscription échouée - mot de passe sans majuscule
- * ❌ Inscription échouée - mot de passe sans chiffre
- * ❌ Inscription échouée - mot de passe sans caractère spécial
- */
-
 import { RegisterUserUseCase } from '../RegisterUserUseCase';
 import { RegisterUserRepository } from '../RegisterUserRepository';
 import { User } from '@/domain/user/User';
 
-// ==================== TEST DOUBLES ====================
-
-/**
- * Dummy Repository - Simule un repository sans email existant
- */
 class RegisterUserDummyRepository implements RegisterUserRepository {
   async save(user: User): Promise<string> {
     return 'fake-user-id-123';
   }
 
   async emailExists(email: string): Promise<boolean> {
-    return false; // Aucun email n'existe
+    return false;
   }
 }
 
-/**
- * Dummy Repository - Simule un email déjà existant
- */
 class RegisterUserDummyRepositoryWithExistingEmail implements RegisterUserRepository {
   async save(user: User): Promise<string> {
     throw new Error('Ne devrait jamais être appelé');
   }
 
   async emailExists(email: string): Promise<boolean> {
-    return email === 'existing@example.com'; // Cet email existe déjà
+    return email === 'existing@example.com';
   }
 }
 
-// ==================== TESTS ====================
-
 describe('RegisterUserUseCase (US-9)', () => {
-  // ==================== SCÉNARIO 1 : Inscription réussie avec nom ====================
   it('devrait créer un utilisateur avec succès (avec nom)', async () => {
     // Étant donné
     const repository = new RegisterUserDummyRepository();
@@ -72,7 +41,6 @@ describe('RegisterUserUseCase (US-9)', () => {
     expect(result.name).toBe('Alice Dupont');
   });
 
-  // ==================== SCÉNARIO 2 : Inscription réussie sans nom ====================
   it('devrait créer un utilisateur avec succès (sans nom)', async () => {
     // Étant donné
     const repository = new RegisterUserDummyRepository();
@@ -90,7 +58,6 @@ describe('RegisterUserUseCase (US-9)', () => {
     expect(result.name).toBeUndefined();
   });
 
-  // ==================== SCÉNARIO 3 : Inscription échouée - email déjà utilisé ====================
   it('devrait rejeter une inscription avec un email déjà utilisé', async () => {
     // Étant donné
     const repository = new RegisterUserDummyRepositoryWithExistingEmail();
@@ -106,7 +73,6 @@ describe('RegisterUserUseCase (US-9)', () => {
     ).rejects.toThrow('déjà utilisé');
   });
 
-  // ==================== SCÉNARIO 4 : Inscription échouée - email invalide ====================
   it('devrait rejeter une inscription avec un email invalide', async () => {
     // Étant donné
     const repository = new RegisterUserDummyRepository();
@@ -121,7 +87,6 @@ describe('RegisterUserUseCase (US-9)', () => {
     ).rejects.toThrow('email');
   });
 
-  // ==================== SCÉNARIO 5 : Inscription échouée - mot de passe trop court ====================
   it('devrait rejeter un mot de passe trop court', async () => {
     // Étant donné
     const repository = new RegisterUserDummyRepository();
@@ -136,7 +101,6 @@ describe('RegisterUserUseCase (US-9)', () => {
     ).rejects.toThrow('minimum 8 caractères');
   });
 
-  // ==================== SCÉNARIO 6 : Inscription échouée - mot de passe sans majuscule ====================
   it('devrait rejeter un mot de passe sans majuscule', async () => {
     // Étant donné
     const repository = new RegisterUserDummyRepository();
@@ -151,7 +115,6 @@ describe('RegisterUserUseCase (US-9)', () => {
     ).rejects.toThrow('majuscule');
   });
 
-  // ==================== SCÉNARIO 7 : Inscription échouée - mot de passe sans chiffre ====================
   it('devrait rejeter un mot de passe sans chiffre', async () => {
     // Étant donné
     const repository = new RegisterUserDummyRepository();
@@ -166,7 +129,6 @@ describe('RegisterUserUseCase (US-9)', () => {
     ).rejects.toThrow('chiffre');
   });
 
-  // ==================== SCÉNARIO 8 : Inscription échouée - mot de passe sans caractère spécial ====================
   it('devrait rejeter un mot de passe sans caractère spécial', async () => {
     // Étant donné
     const repository = new RegisterUserDummyRepository();
@@ -180,8 +142,6 @@ describe('RegisterUserUseCase (US-9)', () => {
       })
     ).rejects.toThrow('caractère spécial');
   });
-
-  // ==================== TESTS ADDITIONNELS ====================
 
   it('devrait rejeter un nom trop long (> 100 caractères)', async () => {
     // Étant donné

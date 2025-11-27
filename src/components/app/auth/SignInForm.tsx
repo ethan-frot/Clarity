@@ -1,5 +1,8 @@
 'use client';
 
+// Ce composant est côté client car il utilise React Hook Form (useState, useForm)
+// et nécessite des event handlers interactifs (onChange, onSubmit)
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
@@ -20,8 +23,23 @@ interface SignInFormData {
 /**
  * Formulaire de connexion (US-10)
  *
- * Utilise NextAuth pour authentifier l'utilisateur via le Credentials Provider.
- * Le provider appelle le SignInUseCase côté serveur pour valider les credentials.
+ * Permet à un utilisateur de se connecter avec son email et mot de passe.
+ *
+ * Architecture NextAuth :
+ * 1. Ce composant client appelle signIn('credentials', {...}) de next-auth/react
+ * 2. NextAuth envoie les credentials au Credentials Provider (@/lib/auth.ts)
+ * 3. Le provider exécute SignInUseCase pour valider les credentials
+ * 4. Si succès : NextAuth crée une session JWT + cookie httpOnly
+ * 5. Si échec : NextAuth retourne { error: 'CredentialsSignin', ok: false }
+ *
+ * Gestion des erreurs :
+ * - result.error : Credentials invalides (email ou password incorrect)
+ * - !result.ok : Erreur technique (serveur, réseau, etc.)
+ *
+ * Sécurité :
+ * - Message d'erreur volontairement vague pour éviter l'énumération d'emails
+ * - Session stockée dans cookie httpOnly (protection XSS)
+ * - Cookie sécurisé (HTTPS only en production)
  */
 export function SignInForm() {
   const router = useRouter();
@@ -37,33 +55,38 @@ export function SignInForm() {
     setIsLoading(true);
 
     try {
-      // Utilisation de la fonction signIn de NextAuth
+      // Appel du provider NextAuth Credentials
+      // redirect: false permet de gérer manuellement la redirection et d'afficher des toasts
       const result = await signIn('credentials', {
         email: data.email,
         password: data.password,
-        redirect: false, // On gère la redirection manuellement
+        redirect: false,
       });
 
-      // Vérification des erreurs : NextAuth retourne error si l'authentification échoue
+      // Cas 1 : Credentials invalides (email ou password incorrect)
+      // NextAuth retourne { error: 'CredentialsSignin' } si le provider rejette
       if (result?.error) {
-        // Échec de la connexion (CredentialsSignin)
+        // Sécurité : Message volontairement vague pour ne pas révéler si l'email existe
         toast.error('Email ou mot de passe incorrect');
         return;
       }
 
-      // Vérification supplémentaire : ok doit être true
+      // Cas 2 : Erreur technique (serveur inaccessible, erreur réseau, etc.)
+      // ok devrait être true si la connexion a réussi
       if (!result?.ok) {
         toast.error('Une erreur est survenue lors de la connexion');
         return;
       }
 
-      // Succès de la connexion
+      // Cas 3 : Succès - Session créée par NextAuth (cookie httpOnly + JWT)
       toast.success('Connexion réussie');
 
-      // Redirection vers la page d'accueil après un court délai
+      // Redirection différée pour laisser le temps à l'utilisateur de lire le toast
+      // router.refresh() est nécessaire pour forcer Next.js à refetch les composants serveur
+      // avec la nouvelle session (notamment pour mettre à jour le navbar)
       setTimeout(() => {
         router.push('/');
-        router.refresh(); // Force le rafraîchissement pour mettre à jour la session
+        router.refresh();
       }, 1500);
     } catch (error) {
       console.error('Erreur lors de la connexion:', error);

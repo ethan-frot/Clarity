@@ -1,18 +1,15 @@
 import { SignOutUseCase } from '../SignOutUseCase';
 import { SignOutRepository } from '../SignOutRepository';
 
-/**
- * Test double (dummy) - Repository simulant la révocation des sessions
- */
 class SignOutDummyRepository implements SignOutRepository {
   private sessionsByUser: Map<string, number> = new Map([
-    ['user-123', 2], // Utilisateur avec 2 sessions actives
-    ['user-456', 1], // Utilisateur avec 1 session active
+    ['user-123', 2],
+    ['user-456', 1],
   ]);
 
   async revokeAllUserSessions(userId: string): Promise<number> {
     const count = this.sessionsByUser.get(userId) || 0;
-    this.sessionsByUser.set(userId, 0); // Simuler la révocation
+    this.sessionsByUser.set(userId, 0);
     return count;
   }
 }
@@ -32,7 +29,7 @@ describe('SignOutUseCase (US-11)', () => {
       // Alors
       expect(result).toBeDefined();
       expect(result.success).toBe(true);
-      expect(result.revokedSessions).toBe(2); // 2 sessions révoquées
+      expect(result.revokedSessions).toBe(2);
     });
   });
 
@@ -44,13 +41,13 @@ describe('SignOutUseCase (US-11)', () => {
 
       // Quand
       const result = await useCase.execute({
-        userId: 'user-999', // Utilisateur sans sessions
+        userId: 'user-999',
       });
 
       // Alors
       expect(result).toBeDefined();
       expect(result.success).toBe(true);
-      expect(result.revokedSessions).toBe(0); // Aucune session révoquée
+      expect(result.revokedSessions).toBe(0);
     });
   });
 
@@ -113,7 +110,7 @@ describe('SignOutUseCase (US-11)', () => {
       // Alors
       expect(result).toBeDefined();
       expect(result.success).toBe(true);
-      expect(result.revokedSessions).toBe(1); // 1 session révoquée
+      expect(result.revokedSessions).toBe(1);
     });
   });
 });

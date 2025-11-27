@@ -3,12 +3,9 @@ import { SignInRepository } from '../SignInRepository';
 import { User } from '@/domain/user/User';
 import * as bcrypt from 'bcryptjs';
 
-// Test double (dummy) - Utilisateur trouvé
 class SignInDummyRepository implements SignInRepository {
   async findByEmail(email: string): Promise<User | null> {
     if (email === 'alice@example.com') {
-      // Retourne un utilisateur avec mot de passe haché
-      // Hash de "SecureP@ss123"
       const hashedPassword = await bcrypt.hash('SecureP@ss123', 10);
       return new User({
         id: 'user-123',
@@ -39,7 +36,6 @@ describe('SignInUseCase (US-10)', () => {
       expect(result.userId).toBe('user-123');
       expect(result.email).toBe('alice@example.com');
       expect(result.name).toBe('Alice Dupont');
-      // Le mot de passe ne doit JAMAIS être retourné
       expect(result).not.toHaveProperty('password');
     });
   });
