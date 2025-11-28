@@ -21,9 +21,35 @@ export class ListConversationsPrismaRepository
         deletedAt: null,
       },
       include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        messages: {
+          where: {
+            deletedAt: null,
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+          take: 1,
+          select: {
+            id: true,
+            content: true,
+            authorId: true,
+            createdAt: true,
+          },
+        },
         _count: {
           select: {
-            messages: true,
+            messages: {
+              where: {
+                deletedAt: null,
+              },
+            },
           },
         },
       },
@@ -51,6 +77,19 @@ export class ListConversationsPrismaRepository
         deletedAt: conversationEntity.deletedAt,
         updateTitle: conversationEntity.updateTitle.bind(conversationEntity),
         messageCount: conv._count.messages,
+        author: {
+          id: conv.author.id,
+          name: conv.author.name,
+          email: conv.author.email,
+        },
+        lastMessage: conv.messages[0]
+          ? {
+              id: conv.messages[0].id,
+              content: conv.messages[0].content,
+              authorId: conv.messages[0].authorId,
+              createdAt: conv.messages[0].createdAt,
+            }
+          : undefined,
       } as ConversationWithCount;
     });
   }

@@ -1,11 +1,26 @@
+interface AuthorInfo {
+  id: string;
+  name: string | null;
+  email: string;
+}
+
+interface LastMessage {
+  id: string;
+  content: string;
+  authorId: string;
+  createdAt: string;
+}
+
 interface ConversationWithCount {
   id?: string;
   title: string;
   authorId: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  deletedAt?: Date | null;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string | null;
   messageCount: number;
+  author: AuthorInfo;
+  lastMessage?: LastMessage;
 }
 
 interface ListConversationsResponse {
