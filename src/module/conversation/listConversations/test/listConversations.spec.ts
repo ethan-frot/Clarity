@@ -1,8 +1,6 @@
 import { Conversation } from '@/domain/conversation/Conversation';
-import {
-  ConversationWithCount,
-  ListConversationsRepository,
-} from '../ListConversationsRepository';
+import { ListConversationsRepository } from '../ListConversationsRepository';
+import { ConversationWithCount } from '../types/listConversations.types';
 import { ListConversationsUseCase } from '../ListConversationsUseCase';
 
 class ListConversationsDummyRepository implements ListConversationsRepository {
@@ -48,9 +46,18 @@ describe('ListConversationsUseCase (US-2)', () => {
     });
 
     const conversationsWithCount: ConversationWithCount[] = [
-      Object.assign(conv1, { messageCount: 5 }),
-      Object.assign(conv2, { messageCount: 3 }),
-      Object.assign(conv3, { messageCount: 10 }),
+      Object.assign(conv1, {
+        messageCount: 5,
+        author: { id: 'user-1', name: 'User 1', email: 'user1@example.com' },
+      }),
+      Object.assign(conv2, {
+        messageCount: 3,
+        author: { id: 'user-2', name: 'User 2', email: 'user2@example.com' },
+      }),
+      Object.assign(conv3, {
+        messageCount: 10,
+        author: { id: 'user-3', name: 'User 3', email: 'user3@example.com' },
+      }),
     ];
 
     const repository = new ListConversationsDummyRepository(conversationsWithCount);
@@ -85,8 +92,14 @@ describe('ListConversationsUseCase (US-2)', () => {
     });
 
     const conversationsWithCount: ConversationWithCount[] = [
-      Object.assign(conv1, { messageCount: 5 }),
-      Object.assign(conv2, { messageCount: 3 }),
+      Object.assign(conv1, {
+        messageCount: 5,
+        author: { id: 'user-1', name: 'User 1', email: 'user1@example.com' },
+      }),
+      Object.assign(conv2, {
+        messageCount: 3,
+        author: { id: 'user-2', name: 'User 2', email: 'user2@example.com' },
+      }),
     ];
 
     const repository = new ListConversationsDummyRepository(conversationsWithCount);
@@ -123,7 +136,10 @@ describe('ListConversationsUseCase (US-2)', () => {
     });
 
     const conversationsWithCount: ConversationWithCount[] = [
-      Object.assign(conv1, { messageCount: 15 }),
+      Object.assign(conv1, {
+        messageCount: 15,
+        author: { id: 'user-1', name: 'User 1', email: 'user1@example.com' },
+      }),
     ];
 
     const repository = new ListConversationsDummyRepository(conversationsWithCount);

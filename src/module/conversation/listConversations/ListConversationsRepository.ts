@@ -1,24 +1,10 @@
-import { Conversation } from '@/domain/conversation/Conversation';
+import { ConversationWithCount } from './types/listConversations.types';
 
-export interface AuthorInfo {
-  id: string;
-  name: string | null;
-  email: string;
-}
-
-export interface LastMessage {
-  id: string;
-  content: string;
-  authorId: string;
-  createdAt: Date;
-}
-
-export interface ConversationWithCount extends Conversation {
-  messageCount: number;
-  author: AuthorInfo;
-  lastMessage?: LastMessage;
-}
-
+/**
+ * Repository pour le use case ListConversations
+ *
+ * Pattern : Port (Hexagonal Architecture)
+ */
 export interface ListConversationsRepository {
   findAll(): Promise<ConversationWithCount[]>;
 }

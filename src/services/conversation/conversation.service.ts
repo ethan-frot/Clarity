@@ -1,17 +1,13 @@
-interface AuthorInfo {
-  id: string;
-  name: string | null;
-  email: string;
-}
+import type {
+  AuthorInfo,
+  ConversationWithCount as ConversationWithCountDomain,
+} from "@/module/conversation/listConversations/types/listConversations.types";
 
-interface LastMessage {
-  id: string;
-  content: string;
-  authorId: string;
-  createdAt: string;
-}
-
-interface ConversationWithCount {
+/**
+ * Version sérialisée de ConversationWithCount pour le transport JSON
+ * Les dates sont converties en strings lors de la sérialisation HTTP
+ */
+interface ConversationWithCountSerialized {
   id?: string;
   title: string;
   authorId: string;
@@ -20,11 +16,16 @@ interface ConversationWithCount {
   deletedAt?: string | null;
   messageCount: number;
   author: AuthorInfo;
-  lastMessage?: LastMessage;
+  lastMessage?: {
+    id: string;
+    content: string;
+    authorId: string;
+    createdAt: string;
+  };
 }
 
 interface ListConversationsResponse {
-  conversations: ConversationWithCount[];
+  conversations: ConversationWithCountSerialized[];
 }
 
 interface CreateConversationInput {
@@ -37,14 +38,16 @@ interface CreateConversationResponse {
 }
 
 export async function fetchConversations(): Promise<ListConversationsResponse> {
-  const response = await fetch('/api/conversations', {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+  const response = await fetch("/api/conversations", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
   });
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error || 'Erreur lors de la récupération des conversations');
+    throw new Error(
+      errorData.error || "Erreur lors de la récupération des conversations"
+    );
   }
 
   return response.json();
@@ -53,15 +56,17 @@ export async function fetchConversations(): Promise<ListConversationsResponse> {
 export async function createConversation(
   data: CreateConversationInput
 ): Promise<CreateConversationResponse> {
-  const response = await fetch('/api/conversations', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  const response = await fetch("/api/conversations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error || 'Erreur lors de la création de la conversation');
+    throw new Error(
+      errorData.error || "Erreur lors de la création de la conversation"
+    );
   }
 
   return response.json();

@@ -1,10 +1,8 @@
-import { prisma } from "@/lib/prisma";
-import { PrismaClient } from "@/generated/prisma";
-import {
-  ConversationWithCount,
-  ListConversationsRepository,
-} from "./ListConversationsRepository";
-import { Conversation } from "@/domain/conversation/Conversation";
+import { prisma } from '@/lib/prisma';
+import { PrismaClient } from '@/generated/prisma';
+import { ListConversationsRepository } from './ListConversationsRepository';
+import { ConversationWithCount } from './types/listConversations.types';
+import { Conversation } from '@/domain/conversation/Conversation';
 
 export class ListConversationsPrismaRepository
   implements ListConversationsRepository

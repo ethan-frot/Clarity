@@ -1,7 +1,5 @@
-import {
-  ConversationWithCount,
-  ListConversationsRepository,
-} from './ListConversationsRepository';
+import { ListConversationsRepository } from './ListConversationsRepository';
+import { ConversationWithCount } from './types/listConversations.types';
 
 /**
  * Use Case : Lister toutes les conversations (US-2)
