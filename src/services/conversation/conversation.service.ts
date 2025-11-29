@@ -24,6 +24,25 @@ interface ConversationWithCountSerialized {
   };
 }
 
+interface MessageWithAuthorSerialized {
+  id: string;
+  content: string;
+  authorId: string;
+  createdAt: string;
+  updatedAt: string;
+  author: AuthorInfo;
+}
+
+interface ConversationWithMessagesSerialized {
+  id: string;
+  title: string;
+  authorId: string;
+  createdAt: string;
+  updatedAt: string;
+  author: AuthorInfo;
+  messages: MessageWithAuthorSerialized[];
+}
+
 interface ListConversationsResponse {
   conversations: ConversationWithCountSerialized[];
 }
@@ -66,6 +85,24 @@ export async function createConversation(
     const errorData = await response.json();
     throw new Error(
       errorData.error || "Erreur lors de la création de la conversation"
+    );
+  }
+
+  return response.json();
+}
+
+export async function fetchConversationById(
+  id: string
+): Promise<ConversationWithMessagesSerialized> {
+  const response = await fetch(`/api/conversations/${id}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.error || "Erreur lors de la récupération de la conversation"
     );
   }
 
