@@ -9,13 +9,14 @@ import { GetConversationByIdPrismaRepository } from '@/module/conversation/getCo
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const repository = new GetConversationByIdPrismaRepository();
     const useCase = new GetConversationByIdUseCase(repository);
 
-    const result = await useCase.execute(params.id);
+    const result = await useCase.execute(id);
 
     return Response.json(result, { status: 200 });
   } catch (error) {
