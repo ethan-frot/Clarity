@@ -1,9 +1,7 @@
 /**
  * Configuration NextAuth v5 - US-10
  *
- * Sessions :
- * - Access Token : 5 minutes (JWT maxAge)
- * - Refresh Token : 30 jours (session maxAge)
+ * Session JWT : 30 jours
  */
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
@@ -46,10 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 jours (Refresh Token)
-  },
-  jwt: {
-    maxAge: 5 * 60, // 5 minutes (Access Token)
+    maxAge: 30 * 24 * 60 * 60, // 30 jours
   },
   cookies: {
     sessionToken: {
