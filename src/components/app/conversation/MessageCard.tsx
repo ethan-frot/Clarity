@@ -42,7 +42,7 @@ export function MessageCard({ message }: MessageCardProps) {
               </div>
             </div>
 
-            <p className="text-sm text-white/80 whitespace-pre-wrap wrap-break-words">
+            <p className="text-sm text-white/80 whitespace-pre-wrap break-words">
               {message.content}
             </p>
           </div>
