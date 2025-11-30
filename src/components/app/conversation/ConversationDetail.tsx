@@ -1,10 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { MessageSquare, ArrowLeft, User, Clock } from "lucide-react";
+import { MessageSquare, ArrowLeft, Clock } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { MessageCard } from "./MessageCard";
+import { UpdateConversationTitleDialog } from "./UpdateConversationTitleDialog";
 import { fetchConversationById } from "@/services/conversation/conversation.service";
 import { getRelativeTime } from "@/lib/date";
 
@@ -15,6 +17,8 @@ interface ConversationDetailProps {
 export function ConversationDetail({
   conversationId,
 }: ConversationDetailProps) {
+  const { data: session } = useSession();
+
   const {
     data: conversation,
     isLoading,
@@ -77,7 +81,16 @@ export function ConversationDetail({
       </Link>
 
       <Card className="bg-white/5 backdrop-blur-sm border-white/10 mb-8">
-        <CardHeader>
+        <CardHeader className="relative">
+          {session?.user?.id === conversation.authorId && (
+            <div className="absolute right-4">
+              <UpdateConversationTitleDialog
+                conversationId={conversationId}
+                currentTitle={conversation.title}
+              />
+            </div>
+          )}
+
           <div className="flex items-start gap-4 mb-4">
             <div className="h-12 w-12 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold shrink-0">
               {authorDisplayName.charAt(0).toUpperCase()}
