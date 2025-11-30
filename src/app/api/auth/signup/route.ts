@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
     if (!email || !password) {
       return Response.json(
-        { error: 'L\'email et le mot de passe sont requis' },
+        { error: "L'email et le mot de passe sont requis" },
         { status: 400 }
       );
     }
@@ -40,14 +40,11 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Erreur lors de l\'inscription:', error);
+    console.error("Erreur lors de l'inscription:", error);
 
     if (error instanceof Error) {
       if (error.message.includes('déjà utilisé')) {
-        return Response.json(
-          { error: error.message },
-          { status: 409 }
-        );
+        return Response.json({ error: error.message }, { status: 409 });
       }
 
       if (
@@ -55,16 +52,10 @@ export async function POST(request: NextRequest) {
         error.message.includes('mot de passe') ||
         error.message.includes('nom')
       ) {
-        return Response.json(
-          { error: error.message },
-          { status: 400 }
-        );
+        return Response.json({ error: error.message }, { status: 400 });
       }
 
-      return Response.json(
-        { error: error.message },
-        { status: 400 }
-      );
+      return Response.json({ error: error.message }, { status: 400 });
     }
 
     return Response.json(

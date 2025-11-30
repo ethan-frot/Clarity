@@ -1,11 +1,11 @@
 import {
   PostgreSqlContainer,
   StartedPostgreSqlContainer,
-} from "@testcontainers/postgresql";
-import { PrismaClient } from "@/generated/prisma";
-import { SignOutUseCase } from "../SignOutUseCase";
-import { SignOutPrismaRepository } from "../SignOutPrismaRepository";
-import { hashPassword } from "@/lib/password";
+} from '@testcontainers/postgresql';
+import { PrismaClient } from '@/generated/prisma';
+import { SignOutUseCase } from '../SignOutUseCase';
+import { SignOutPrismaRepository } from '../SignOutPrismaRepository';
+import { hashPassword } from '@/lib/password';
 
 let container: StartedPostgreSqlContainer;
 let prisma: PrismaClient;
@@ -13,10 +13,10 @@ let useCase: SignOutUseCase;
 let repository: SignOutPrismaRepository;
 
 beforeAll(async () => {
-  container = await new PostgreSqlContainer("postgres:16-alpine")
-    .withDatabase("test_forum")
-    .withUsername("test")
-    .withPassword("test")
+  container = await new PostgreSqlContainer('postgres:16-alpine')
+    .withDatabase('test_forum')
+    .withUsername('test')
+    .withPassword('test')
     .start();
 
   process.env.DATABASE_URL = container.getConnectionUri();
@@ -29,9 +29,9 @@ beforeAll(async () => {
     },
   });
 
-  const { execSync } = require("child_process");
-  execSync("npx prisma db push --skip-generate", {
-    stdio: "inherit",
+  const { execSync } = require('child_process');
+  execSync('npx prisma db push --skip-generate', {
+    stdio: 'inherit',
     env: { ...process.env, DATABASE_URL: container.getConnectionUri() },
   });
 
@@ -49,15 +49,15 @@ beforeEach(async () => {
   await prisma.user.deleteMany();
 });
 
-describe("SignOut Integration (E2E - US-11)", () => {
+describe('SignOut Integration (E2E - US-11)', () => {
   it("devrait révoquer toutes les sessions actives de l'utilisateur", async () => {
     // Étant donné
-    const hashedPassword = await hashPassword("SecureP@ss123");
+    const hashedPassword = await hashPassword('SecureP@ss123');
     const user = await prisma.user.create({
       data: {
-        email: "alice@example.com",
+        email: 'alice@example.com',
         password: hashedPassword,
-        name: "Alice Dupont",
+        name: 'Alice Dupont',
       },
     });
 
@@ -65,20 +65,20 @@ describe("SignOut Integration (E2E - US-11)", () => {
       data: [
         {
           userId: user.id,
-          accessToken: "access-token-1",
-          refreshToken: "refresh-token-1",
+          accessToken: 'access-token-1',
+          refreshToken: 'refresh-token-1',
           expiresAt: new Date(Date.now() + 5 * 60 * 1000),
         },
         {
           userId: user.id,
-          accessToken: "access-token-2",
-          refreshToken: "refresh-token-2",
+          accessToken: 'access-token-2',
+          refreshToken: 'refresh-token-2',
           expiresAt: new Date(Date.now() + 5 * 60 * 1000),
         },
         {
           userId: user.id,
-          accessToken: "access-token-3",
-          refreshToken: "refresh-token-3",
+          accessToken: 'access-token-3',
+          refreshToken: 'refresh-token-3',
           expiresAt: new Date(Date.now() + 5 * 60 * 1000),
         },
       ],
@@ -107,12 +107,12 @@ describe("SignOut Integration (E2E - US-11)", () => {
 
   it("devrait retourner succès même si l'utilisateur n'a pas de sessions", async () => {
     // Étant donné
-    const hashedPassword = await hashPassword("SecureP@ss123");
+    const hashedPassword = await hashPassword('SecureP@ss123');
     const user = await prisma.user.create({
       data: {
-        email: "bob@example.com",
+        email: 'bob@example.com',
         password: hashedPassword,
-        name: "Bob Martin",
+        name: 'Bob Martin',
       },
     });
 
@@ -127,14 +127,14 @@ describe("SignOut Integration (E2E - US-11)", () => {
     expect(result.revokedSessions).toBe(0);
   });
 
-  it("devrait ne pas compter les sessions déjà révoquées", async () => {
+  it('devrait ne pas compter les sessions déjà révoquées', async () => {
     // Étant donné
-    const hashedPassword = await hashPassword("SecureP@ss123");
+    const hashedPassword = await hashPassword('SecureP@ss123');
     const user = await prisma.user.create({
       data: {
-        email: "charlie@example.com",
+        email: 'charlie@example.com',
         password: hashedPassword,
-        name: "Charlie Brown",
+        name: 'Charlie Brown',
       },
     });
 
@@ -142,22 +142,22 @@ describe("SignOut Integration (E2E - US-11)", () => {
       data: [
         {
           userId: user.id,
-          accessToken: "access-token-active-1",
-          refreshToken: "refresh-token-active-1",
+          accessToken: 'access-token-active-1',
+          refreshToken: 'refresh-token-active-1',
           expiresAt: new Date(Date.now() + 5 * 60 * 1000),
           revokedAt: null,
         },
         {
           userId: user.id,
-          accessToken: "access-token-active-2",
-          refreshToken: "refresh-token-active-2",
+          accessToken: 'access-token-active-2',
+          refreshToken: 'refresh-token-active-2',
           expiresAt: new Date(Date.now() + 5 * 60 * 1000),
           revokedAt: null,
         },
         {
           userId: user.id,
-          accessToken: "access-token-revoked",
-          refreshToken: "refresh-token-revoked",
+          accessToken: 'access-token-revoked',
+          refreshToken: 'refresh-token-revoked',
           expiresAt: new Date(Date.now() + 5 * 60 * 1000),
           revokedAt: new Date(Date.now() - 10000),
         },
@@ -186,21 +186,21 @@ describe("SignOut Integration (E2E - US-11)", () => {
 
   it("devrait révoquer uniquement les sessions de l'utilisateur spécifié", async () => {
     // Étant donné
-    const hashedPassword = await hashPassword("SecureP@ss123");
+    const hashedPassword = await hashPassword('SecureP@ss123');
 
     const alice = await prisma.user.create({
       data: {
-        email: "alice@example.com",
+        email: 'alice@example.com',
         password: hashedPassword,
-        name: "Alice",
+        name: 'Alice',
       },
     });
 
     const bob = await prisma.user.create({
       data: {
-        email: "bob@example.com",
+        email: 'bob@example.com',
         password: hashedPassword,
-        name: "Bob",
+        name: 'Bob',
       },
     });
 
@@ -208,26 +208,26 @@ describe("SignOut Integration (E2E - US-11)", () => {
       data: [
         {
           userId: alice.id,
-          accessToken: "alice-access-1",
-          refreshToken: "alice-refresh-1",
+          accessToken: 'alice-access-1',
+          refreshToken: 'alice-refresh-1',
           expiresAt: new Date(Date.now() + 5 * 60 * 1000),
         },
         {
           userId: alice.id,
-          accessToken: "alice-access-2",
-          refreshToken: "alice-refresh-2",
+          accessToken: 'alice-access-2',
+          refreshToken: 'alice-refresh-2',
           expiresAt: new Date(Date.now() + 5 * 60 * 1000),
         },
         {
           userId: bob.id,
-          accessToken: "bob-access-1",
-          refreshToken: "bob-refresh-1",
+          accessToken: 'bob-access-1',
+          refreshToken: 'bob-refresh-1',
           expiresAt: new Date(Date.now() + 5 * 60 * 1000),
         },
         {
           userId: bob.id,
-          accessToken: "bob-access-2",
-          refreshToken: "bob-refresh-2",
+          accessToken: 'bob-access-2',
+          refreshToken: 'bob-refresh-2',
           expiresAt: new Date(Date.now() + 5 * 60 * 1000),
         },
       ],
@@ -259,9 +259,9 @@ describe("SignOut Integration (E2E - US-11)", () => {
     });
   });
 
-  it("devrait retourner succès même avec un userId inexistant", async () => {
+  it('devrait retourner succès même avec un userId inexistant', async () => {
     // Étant donné
-    const fakeUserId = "clxxx-fake-user-id-xxx";
+    const fakeUserId = 'clxxx-fake-user-id-xxx';
 
     // Quand
     const result = await useCase.execute({
@@ -274,13 +274,13 @@ describe("SignOut Integration (E2E - US-11)", () => {
     expect(result.revokedSessions).toBe(0);
   });
 
-  it("devrait rejeter un userId vide", async () => {
+  it('devrait rejeter un userId vide', async () => {
     // Étant donné
     const command = {
-      userId: "",
+      userId: '',
     };
 
     // Quand / Alors
-    await expect(useCase.execute(command)).rejects.toThrow("userId");
+    await expect(useCase.execute(command)).rejects.toThrow('userId');
   });
 });

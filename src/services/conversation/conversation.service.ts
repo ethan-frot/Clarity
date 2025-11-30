@@ -1,7 +1,4 @@
-import type {
-  AuthorInfo,
-  ConversationWithCount as ConversationWithCountDomain,
-} from "@/module/conversation/listConversations/types/listConversations.types";
+import type { AuthorInfo } from '@/module/conversation/listConversations/types/listConversations.types';
 
 /**
  * Version sérialisée de ConversationWithCount pour le transport JSON
@@ -74,15 +71,15 @@ interface DeleteConversationResponse {
 }
 
 export async function fetchConversations(): Promise<ListConversationsResponse> {
-  const response = await fetch("/api/conversations", {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
+  const response = await fetch('/api/conversations', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(
-      errorData.error || "Erreur lors de la récupération des conversations"
+      errorData.error || 'Erreur lors de la récupération des conversations'
     );
   }
 
@@ -92,16 +89,16 @@ export async function fetchConversations(): Promise<ListConversationsResponse> {
 export async function createConversation(
   data: CreateConversationInput
 ): Promise<CreateConversationResponse> {
-  const response = await fetch("/api/conversations", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  const response = await fetch('/api/conversations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
 
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(
-      errorData.error || "Erreur lors de la création de la conversation"
+      errorData.error || 'Erreur lors de la création de la conversation'
     );
   }
 
@@ -112,14 +109,14 @@ export async function fetchConversationById(
   id: string
 ): Promise<ConversationWithMessagesSerialized> {
   const response = await fetch(`/api/conversations/${id}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(
-      errorData.error || "Erreur lors de la récupération de la conversation"
+      errorData.error || 'Erreur lors de la récupération de la conversation'
     );
   }
 
@@ -130,15 +127,15 @@ export async function updateConversationTitle(
   data: UpdateConversationInput
 ): Promise<UpdateConversationResponse> {
   const response = await fetch(`/api/conversations/${data.conversationId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ title: data.title }),
   });
 
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(
-      errorData.error || "Erreur lors de la mise à jour de la conversation"
+      errorData.error || 'Erreur lors de la mise à jour de la conversation'
     );
   }
 
@@ -149,14 +146,14 @@ export async function deleteConversation(
   data: DeleteConversationInput
 ): Promise<DeleteConversationResponse> {
   const response = await fetch(`/api/conversations/${data.conversationId}`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(
-      errorData.error || "Erreur lors de la suppression de la conversation"
+      errorData.error || 'Erreur lors de la suppression de la conversation'
     );
   }
 

@@ -2,9 +2,7 @@ import { DeleteConversationUseCase } from '../DeleteConversationUseCase';
 import { DeleteConversationRepository } from '../DeleteConversationRepository';
 import { Conversation } from '@/domain/conversation/Conversation';
 
-class DeleteConversationDummyRepository
-  implements DeleteConversationRepository
-{
+class DeleteConversationDummyRepository implements DeleteConversationRepository {
   private conversations: Map<string, Conversation> = new Map();
 
   constructor(initialConversations: Conversation[] = []) {
@@ -60,7 +58,7 @@ describe('DeleteConversationUseCase (US-5)', () => {
     ).rejects.toThrow('Conversation non trouvée');
   });
 
-  it('devrait rejeter si l\'utilisateur n\'est pas le propriétaire', async () => {
+  it("devrait rejeter si l'utilisateur n'est pas le propriétaire", async () => {
     // Étant donné
     const conversation = new Conversation({
       id: 'conv-123',

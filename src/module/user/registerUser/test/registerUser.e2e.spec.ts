@@ -1,4 +1,7 @@
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import {
+  PostgreSqlContainer,
+  StartedPostgreSqlContainer,
+} from '@testcontainers/postgresql';
 import { PrismaClient } from '@/generated/prisma';
 import { RegisterUserUseCase } from '../RegisterUserUseCase';
 import { RegisterUserPrismaRepository } from '../RegisterUserPrismaRepository';
@@ -29,7 +32,7 @@ beforeAll(async () => {
   const { execSync } = require('child_process');
   execSync('npx prisma db push --skip-generate', {
     stdio: 'inherit',
-    env: { ...process.env, DATABASE_URL: container.getConnectionUri() }
+    env: { ...process.env, DATABASE_URL: container.getConnectionUri() },
   });
 
   repository = new RegisterUserPrismaRepository(prisma);
@@ -72,7 +75,10 @@ describe('RegisterUser Integration (E2E - US-9)', () => {
     expect(user!.password).not.toBe('SecureP@ss123');
     expect(user!.password.startsWith('$2')).toBe(true);
 
-    const isPasswordValid = await verifyPassword('SecureP@ss123', user!.password);
+    const isPasswordValid = await verifyPassword(
+      'SecureP@ss123',
+      user!.password
+    );
     expect(isPasswordValid).toBe(true);
   });
 

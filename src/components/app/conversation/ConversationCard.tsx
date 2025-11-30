@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { MessageSquare, Clock, User } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { getRelativeTime } from "@/lib/date";
+import Link from 'next/link';
+import { MessageSquare, Clock } from 'lucide-react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { getRelativeTime } from '@/lib/date';
 
 interface AuthorInfo {
   id: string;
@@ -70,9 +70,9 @@ export function ConversationCard({ conversation }: ConversationCardProps) {
             <MessageSquare className="h-4 w-4" />
             <span>
               {conversation.messageCount === 0
-                ? "Aucune réponse"
+                ? 'Aucune réponse'
                 : `${conversation.messageCount} réponse${
-                    conversation.messageCount > 1 ? "s" : ""
+                    conversation.messageCount > 1 ? 's' : ''
                   }`}
             </span>
           </div>

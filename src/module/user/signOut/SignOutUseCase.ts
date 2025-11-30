@@ -1,7 +1,7 @@
 /**
  * Use Case : Déconnexion utilisateur (US-11)
  */
-import { SignOutRepository } from "./SignOutRepository";
+import { SignOutRepository } from './SignOutRepository';
 
 export interface SignOutCommand {
   userId: string;
@@ -31,7 +31,7 @@ export class SignOutUseCase {
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error("Impossible de se déconnecter");
+      throw new Error('Impossible de se déconnecter');
     }
   }
 
@@ -40,7 +40,7 @@ export class SignOutUseCase {
       throw new Error("L'identifiant utilisateur (userId) est requis");
     }
 
-    if (typeof userId !== "string" || userId.trim().length === 0) {
+    if (typeof userId !== 'string' || userId.trim().length === 0) {
       throw new Error("L'identifiant utilisateur (userId) est requis");
     }
   }

@@ -1,7 +1,7 @@
 /**
  * Use Case : Supprimer une conversation (US-5)
  */
-import { DeleteConversationRepository } from "./DeleteConversationRepository";
+import { DeleteConversationRepository } from './DeleteConversationRepository';
 
 export interface DeleteConversationCommand {
   conversationId: string;
@@ -15,7 +15,7 @@ export class DeleteConversationUseCase {
     const conversation = await this.repository.findById(command.conversationId);
 
     if (!conversation || conversation.deletedAt) {
-      throw new Error("Conversation non trouvée");
+      throw new Error('Conversation non trouvée');
     }
 
     if (conversation.authorId !== command.userId) {

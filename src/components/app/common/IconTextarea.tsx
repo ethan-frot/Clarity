@@ -15,11 +15,17 @@ interface IconTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaEle
 }
 
 export const IconTextarea = forwardRef<HTMLTextAreaElement, IconTextareaProps>(
-  ({ id, label, icon: Icon, error, helperText, optional, className, ...props }, ref) => {
+  (
+    { id, label, icon: Icon, error, helperText, optional, className, ...props },
+    ref
+  ) => {
     return (
       <div className="space-y-2">
         <Label htmlFor={id} className="text-white/90">
-          {label} {optional && <span className="text-white/50 text-xs">(optionnel)</span>}
+          {label}{' '}
+          {optional && (
+            <span className="text-white/50 text-xs">(optionnel)</span>
+          )}
         </Label>
         <div className="relative">
           <Icon className="absolute left-3 top-3 h-4 w-4 text-white/50" />
@@ -31,7 +37,9 @@ export const IconTextarea = forwardRef<HTMLTextAreaElement, IconTextareaProps>(
           />
         </div>
         {error && <p className="text-xs text-red-400">{error}</p>}
-        {helperText && !error && <p className="text-xs text-white/50">{helperText}</p>}
+        {helperText && !error && (
+          <p className="text-xs text-white/50">{helperText}</p>
+        )}
       </div>
     );
   }

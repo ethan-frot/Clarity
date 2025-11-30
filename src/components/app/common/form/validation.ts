@@ -10,14 +10,14 @@
  * - Maximum 255 caractères
  */
 export const EMAIL_VALIDATION = {
-  required: 'L\'email est requis',
+  required: "L'email est requis",
   pattern: {
     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    message: 'Format d\'email invalide',
+    message: "Format d'email invalide",
   },
   maxLength: {
     value: 255,
-    message: 'L\'email ne peut pas dépasser 255 caractères',
+    message: "L'email ne peut pas dépasser 255 caractères",
   },
 } as const;
 

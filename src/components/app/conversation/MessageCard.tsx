@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { User, Clock } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { getRelativeTime } from "@/lib/date";
+import { Clock } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { getRelativeTime } from '@/lib/date';
 
 interface AuthorInfo {
   id: string;

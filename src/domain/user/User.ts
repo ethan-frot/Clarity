@@ -40,16 +40,16 @@ export class User {
 
   private validateEmail(email: string): void {
     if (!email || email.trim().length === 0) {
-      throw new Error('L\'email est requis');
+      throw new Error("L'email est requis");
     }
 
     if (email.length > 255) {
-      throw new Error('L\'email ne peut pas dépasser 255 caractères');
+      throw new Error("L'email ne peut pas dépasser 255 caractères");
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      throw new Error('Le format de l\'email est invalide');
+      throw new Error("Le format de l'email est invalide");
     }
   }
 
@@ -81,7 +81,9 @@ export class User {
     }
 
     if (!/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) {
-      throw new Error('Le mot de passe doit contenir au moins un caractère spécial (!@#$%^&*()_+-=[]{}|;:,.<>?)');
+      throw new Error(
+        'Le mot de passe doit contenir au moins un caractère spécial (!@#$%^&*()_+-=[]{}|;:,.<>?)'
+      );
     }
   }
 

@@ -10,8 +10,21 @@ interface GradientButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEleme
   size?: 'default' | 'sm' | 'lg' | 'icon';
 }
 
-export const GradientButton = forwardRef<HTMLButtonElement, GradientButtonProps>(
-  ({ children, isLoading, loadingText = 'Chargement...', size = 'lg', className, ...props }, ref) => {
+export const GradientButton = forwardRef<
+  HTMLButtonElement,
+  GradientButtonProps
+>(
+  (
+    {
+      children,
+      isLoading,
+      loadingText = 'Chargement...',
+      size = 'lg',
+      className,
+      ...props
+    },
+    ref
+  ) => {
     return (
       <Button
         ref={ref}

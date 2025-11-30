@@ -3,14 +3,12 @@
  *
  * Implémente le soft delete en définissant deletedAt
  */
-import { prisma } from "@/lib/prisma";
-import { DeleteConversationRepository } from "./DeleteConversationRepository";
-import { Conversation } from "@/domain/conversation/Conversation";
-import { PrismaClient } from "@/generated/prisma";
+import { prisma } from '@/lib/prisma';
+import { DeleteConversationRepository } from './DeleteConversationRepository';
+import { Conversation } from '@/domain/conversation/Conversation';
+import { PrismaClient } from '@/generated/prisma';
 
-export class DeleteConversationPrismaRepository
-  implements DeleteConversationRepository
-{
+export class DeleteConversationPrismaRepository implements DeleteConversationRepository {
   private prismaClient: PrismaClient;
 
   constructor(prismaClient?: PrismaClient) {

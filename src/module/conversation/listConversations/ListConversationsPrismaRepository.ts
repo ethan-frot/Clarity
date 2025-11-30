@@ -4,9 +4,7 @@ import { ListConversationsRepository } from './ListConversationsRepository';
 import { ConversationWithCount } from './types/listConversations.types';
 import { Conversation } from '@/domain/conversation/Conversation';
 
-export class ListConversationsPrismaRepository
-  implements ListConversationsRepository
-{
+export class ListConversationsPrismaRepository implements ListConversationsRepository {
   private prismaClient: PrismaClient;
 
   constructor(prismaClient?: PrismaClient) {
@@ -31,7 +29,7 @@ export class ListConversationsPrismaRepository
             deletedAt: null,
           },
           orderBy: {
-            createdAt: "asc",
+            createdAt: 'asc',
           },
           take: 1,
           select: {
@@ -52,7 +50,7 @@ export class ListConversationsPrismaRepository
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 

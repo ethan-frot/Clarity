@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { GradientButton } from "@/components/app/common/GradientButton";
-import { toast } from "sonner";
-import { signOutUser } from "@/services/auth/auth.service";
+import { useState } from 'react';
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { GradientButton } from '@/components/app/common/GradientButton';
+import { toast } from 'sonner';
+import { signOutUser } from '@/services/auth/auth.service';
 
 /**
  * AuthButton - Bouton d'authentification en haut à droite
@@ -35,17 +35,17 @@ export function AuthButton() {
       await signOut({ redirect: false });
 
       // 3. Afficher le toast de succès
-      toast.success("Déconnexion réussie", {
-        description: "Vous avez été déconnecté avec succès",
+      toast.success('Déconnexion réussie', {
+        description: 'Vous avez été déconnecté avec succès',
       });
 
       // 4. Forcer le refresh des Server Components pour mettre à jour l'UI
       router.refresh();
     } catch (error) {
       // En cas d'erreur
-      console.error("Erreur lors de la déconnexion:", error);
-      toast.error("Erreur lors de la déconnexion", {
-        description: "Une erreur est survenue. Veuillez réessayer.",
+      console.error('Erreur lors de la déconnexion:', error);
+      toast.error('Erreur lors de la déconnexion', {
+        description: 'Une erreur est survenue. Veuillez réessayer.',
       });
     } finally {
       // Désactiver le loading après un court délai pour laisser le temps au refresh
@@ -57,18 +57,18 @@ export function AuthButton() {
 
   // Fonction de redirection vers la page de connexion
   const handleSignIn = () => {
-    router.push("/signin");
+    router.push('/signin');
   };
 
   // Loading state initial
-  if (status === "loading") {
+  if (status === 'loading') {
     return (
       <div className="h-10 w-32 animate-pulse rounded-lg bg-linear-to-r from-blue-500/20 to-violet-600/20" />
     );
   }
 
   // Utilisateur non authentifié
-  if (status === "unauthenticated") {
+  if (status === 'unauthenticated') {
     return (
       <GradientButton onClick={handleSignIn} size="default" className="w-auto">
         Connexion
@@ -77,7 +77,7 @@ export function AuthButton() {
   }
 
   // Utilisateur authentifié
-  if (status === "authenticated" && session?.user) {
+  if (status === 'authenticated' && session?.user) {
     return (
       <GradientButton
         onClick={handleSignOut}

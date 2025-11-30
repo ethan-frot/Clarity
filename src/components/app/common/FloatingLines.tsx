@@ -18,6 +18,7 @@
  * - ResizeObserver pour ajustement responsive
  * - Cleanup automatique des ressources Three.js
  */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from 'react';
 import {
   Scene,
@@ -28,7 +29,7 @@ import {
   ShaderMaterial,
   Vector3,
   Vector2,
-  Clock
+  Clock,
 } from 'three';
 
 /**
@@ -310,9 +311,9 @@ const MAX_GRADIENT_STOPS = 8;
  * Position et rotation d'un groupe de lignes
  */
 type WavePosition = {
-  x: number;        // Offset horizontal
-  y: number;        // Offset vertical
-  rotate: number;   // Facteur de rotation (appliqué logarithmiquement)
+  x: number; // Offset horizontal
+  y: number; // Offset vertical
+  rotate: number; // Facteur de rotation (appliqué logarithmiquement)
 };
 
 /**
@@ -333,7 +334,7 @@ type FloatingLinesProps = {
   mouseDamping?: number;
   parallax?: boolean;
   parallaxStrength?: number;
-  mixBlendMode?: React.CSSProperties['mixBlendMode'];  // Mode de fusion CSS (ex: 'screen', 'multiply')
+  mixBlendMode?: React.CSSProperties['mixBlendMode']; // Mode de fusion CSS (ex: 'screen', 'multiply')
 };
 
 /**
@@ -387,7 +388,7 @@ export default function FloatingLines({
   mouseDamping = 0.05,
   parallax = true,
   parallaxStrength = 0.2,
-  mixBlendMode = 'screen'
+  mixBlendMode = 'screen',
 }: FloatingLinesProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const targetMouseRef = useRef<Vector2>(new Vector2(-1000, -1000));
@@ -420,12 +421,22 @@ export default function FloatingLines({
   };
 
   const topLineCount = enabledWaves.includes('top') ? getLineCount('top') : 0;
-  const middleLineCount = enabledWaves.includes('middle') ? getLineCount('middle') : 0;
-  const bottomLineCount = enabledWaves.includes('bottom') ? getLineCount('bottom') : 0;
+  const middleLineCount = enabledWaves.includes('middle')
+    ? getLineCount('middle')
+    : 0;
+  const bottomLineCount = enabledWaves.includes('bottom')
+    ? getLineCount('bottom')
+    : 0;
 
-  const topLineDistance = enabledWaves.includes('top') ? getLineDistance('top') * 0.01 : 0.01;
-  const middleLineDistance = enabledWaves.includes('middle') ? getLineDistance('middle') * 0.01 : 0.01;
-  const bottomLineDistance = enabledWaves.includes('bottom') ? getLineDistance('bottom') * 0.01 : 0.01;
+  const topLineDistance = enabledWaves.includes('top')
+    ? getLineDistance('top') * 0.01
+    : 0.01;
+  const middleLineDistance = enabledWaves.includes('middle')
+    ? getLineDistance('middle') * 0.01
+    : 0.01;
+  const bottomLineDistance = enabledWaves.includes('bottom')
+    ? getLineDistance('bottom') * 0.01
+    : 0.01;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -440,7 +451,7 @@ export default function FloatingLines({
 
     // Configuration du renderer WebGL
     const renderer = new WebGLRenderer({ antialias: true, alpha: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));  // Limite à 2 pour performances
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); // Limite à 2 pour performances
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
     containerRef.current.appendChild(renderer.domElement);
@@ -465,21 +476,25 @@ export default function FloatingLines({
       bottomLineDistance: { value: bottomLineDistance },
 
       topWavePosition: {
-        value: new Vector3(topWavePosition?.x ?? 10.0, topWavePosition?.y ?? 0.5, topWavePosition?.rotate ?? -0.4)
+        value: new Vector3(
+          topWavePosition?.x ?? 10.0,
+          topWavePosition?.y ?? 0.5,
+          topWavePosition?.rotate ?? -0.4
+        ),
       },
       middleWavePosition: {
         value: new Vector3(
           middleWavePosition?.x ?? 5.0,
           middleWavePosition?.y ?? 0.0,
           middleWavePosition?.rotate ?? 0.2
-        )
+        ),
       },
       bottomWavePosition: {
         value: new Vector3(
           bottomWavePosition?.x ?? 2.0,
           bottomWavePosition?.y ?? -0.7,
           bottomWavePosition?.rotate ?? 0.4
-        )
+        ),
       },
 
       iMouse: { value: new Vector2(-1000, -1000) },
@@ -493,14 +508,17 @@ export default function FloatingLines({
       parallaxOffset: { value: new Vector2(0, 0) },
 
       lineGradient: {
-        value: Array.from({ length: MAX_GRADIENT_STOPS }, () => new Vector3(1, 1, 1))
+        value: Array.from(
+          { length: MAX_GRADIENT_STOPS },
+          () => new Vector3(1, 1, 1)
+        ),
       },
-      lineGradientCount: { value: 0 }
+      lineGradientCount: { value: 0 },
     };
 
     // Configuration du dégradé de couleurs personnalisé
     if (linesGradient && linesGradient.length > 0) {
-      const stops = linesGradient.slice(0, MAX_GRADIENT_STOPS);  // Limite à 8 couleurs
+      const stops = linesGradient.slice(0, MAX_GRADIENT_STOPS); // Limite à 8 couleurs
       uniforms.lineGradientCount.value = stops.length;
 
       stops.forEach((hex, i) => {
@@ -513,7 +531,7 @@ export default function FloatingLines({
     const material = new ShaderMaterial({
       uniforms,
       vertexShader,
-      fragmentShader
+      fragmentShader,
     });
 
     // Géométrie : PlaneGeometry 2x2 couvrant tout l'écran en coordonnées orthographiques
@@ -540,7 +558,10 @@ export default function FloatingLines({
     setSize();
 
     // ResizeObserver pour ajustement responsive automatique
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(setSize) : null;
+    const ro =
+      typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(setSize)
+        : null;
 
     if (ro && containerRef.current) {
       ro.observe(containerRef.current);
@@ -556,7 +577,7 @@ export default function FloatingLines({
 
       // Conversion des coordonnées souris en pixels canvas (prenant en compte le DPR)
       targetMouseRef.current.set(x * dpr, (rect.height - y) * dpr);
-      targetInfluenceRef.current = 1.0;  // Active l'effet de courbure
+      targetInfluenceRef.current = 1.0; // Active l'effet de courbure
 
       // Calcul de l'offset de parallaxe basé sur la position de la souris
       if (parallax) {
@@ -564,12 +585,15 @@ export default function FloatingLines({
         const centerY = rect.height / 2;
         const offsetX = (x - centerX) / rect.width;
         const offsetY = -(y - centerY) / rect.height;
-        targetParallaxRef.current.set(offsetX * parallaxStrength, offsetY * parallaxStrength);
+        targetParallaxRef.current.set(
+          offsetX * parallaxStrength,
+          offsetY * parallaxStrength
+        );
       }
     };
 
     const handlePointerLeave = () => {
-      targetInfluenceRef.current = 0.0;  // Désactive l'effet de courbure
+      targetInfluenceRef.current = 0.0; // Désactive l'effet de courbure
     };
 
     // Enregistrement des event listeners si mode interactif activé
@@ -591,13 +615,18 @@ export default function FloatingLines({
         uniforms.iMouse.value.copy(currentMouseRef.current);
 
         // Interpolation de l'influence de courbure pour transition douce
-        currentInfluenceRef.current += (targetInfluenceRef.current - currentInfluenceRef.current) * mouseDamping;
+        currentInfluenceRef.current +=
+          (targetInfluenceRef.current - currentInfluenceRef.current) *
+          mouseDamping;
         uniforms.bendInfluence.value = currentInfluenceRef.current;
       }
 
       // Interpolation de l'offset de parallaxe
       if (parallax) {
-        currentParallaxRef.current.lerp(targetParallaxRef.current, mouseDamping);
+        currentParallaxRef.current.lerp(
+          targetParallaxRef.current,
+          mouseDamping
+        );
         uniforms.parallaxOffset.value.copy(currentParallaxRef.current);
       }
 
@@ -620,8 +649,14 @@ export default function FloatingLines({
 
       // Suppression des event listeners
       if (interactive) {
-        renderer.domElement.removeEventListener('pointermove', handlePointerMove);
-        renderer.domElement.removeEventListener('pointerleave', handlePointerLeave);
+        renderer.domElement.removeEventListener(
+          'pointermove',
+          handlePointerMove
+        );
+        renderer.domElement.removeEventListener(
+          'pointerleave',
+          handlePointerLeave
+        );
       }
 
       // Libération des ressources Three.js (critique pour éviter les memory leaks)
@@ -646,7 +681,7 @@ export default function FloatingLines({
     bendStrength,
     mouseDamping,
     parallax,
-    parallaxStrength
+    parallaxStrength,
   ]);
 
   return (
@@ -654,7 +689,7 @@ export default function FloatingLines({
       ref={containerRef}
       className="w-full h-full relative overflow-hidden floating-lines-container"
       style={{
-        mixBlendMode: mixBlendMode
+        mixBlendMode: mixBlendMode,
       }}
     />
   );

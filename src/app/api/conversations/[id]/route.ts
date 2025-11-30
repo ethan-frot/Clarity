@@ -69,10 +69,7 @@ export async function PATCH(
     const { title } = body;
 
     if (!title) {
-      return Response.json(
-        { error: 'Le titre est requis' },
-        { status: 400 }
-      );
+      return Response.json({ error: 'Le titre est requis' }, { status: 400 });
     }
 
     const repository = new UpdateConversationPrismaRepository();

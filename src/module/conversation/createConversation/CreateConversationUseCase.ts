@@ -1,6 +1,6 @@
-import { CreateConversationRepository } from "./CreateConversationRepository";
-import { Conversation } from "@/domain/conversation/Conversation";
-import { Message } from "@/domain/message/Message";
+import { CreateConversationRepository } from './CreateConversationRepository';
+import { Conversation } from '@/domain/conversation/Conversation';
+import { Message } from '@/domain/message/Message';
 
 /**
  * Use Case : Créer une conversation (US-1)

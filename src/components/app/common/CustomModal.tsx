@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, ReactNode, useState } from "react";
-import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { useEffect, ReactNode, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { X } from 'lucide-react';
 
 interface CustomModalProps {
   isOpen: boolean;
@@ -15,25 +15,26 @@ export function CustomModal({
   isOpen,
   onClose,
   children,
-  maxWidth = "650px",
+  maxWidth = '650px',
 }: CustomModalProps) {
   const [isClosing, setIsClosing] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // Pattern Next.js SSR : hydratation client-side nécessaire
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden';
       setIsClosing(false);
     } else {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = 'unset';
     }
 
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
 
@@ -47,13 +48,14 @@ export function CustomModal({
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
+      if (e.key === 'Escape' && isOpen) {
         handleClose();
       }
     };
 
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   if (!isOpen && !isClosing) return null;
@@ -64,8 +66,8 @@ export function CustomModal({
       <div
         className={`fixed inset-0 bg-black/10 backdrop-blur-sm ${
           isClosing
-            ? "animate-out fade-out duration-200"
-            : "animate-in fade-in duration-200"
+            ? 'animate-out fade-out duration-200'
+            : 'animate-in fade-in duration-200'
         }`}
         onClick={handleClose}
       />
@@ -73,8 +75,8 @@ export function CustomModal({
       <div
         className={`relative bg-white/2 backdrop-blur-xl border border-white/5 rounded-lg shadow-2xl shadow-blue-500/10 w-full ${
           isClosing
-            ? "animate-out fade-out zoom-out-95 duration-200"
-            : "animate-in fade-in zoom-in-95 duration-200"
+            ? 'animate-out fade-out zoom-out-95 duration-200'
+            : 'animate-in fade-in zoom-in-95 duration-200'
         }`}
         style={{ maxWidth }}
         onClick={(e) => e.stopPropagation()}

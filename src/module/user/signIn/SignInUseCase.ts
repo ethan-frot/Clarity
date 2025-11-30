@@ -4,8 +4,8 @@
  * Règle métier complexe :
  * - Message d'erreur volontairement vague pour éviter énumération d'emails
  */
-import { SignInRepository } from "./SignInRepository";
-import * as bcrypt from "bcryptjs";
+import { SignInRepository } from './SignInRepository';
+import * as bcrypt from 'bcryptjs';
 
 export interface SignInCommand {
   email: string;
@@ -30,7 +30,7 @@ export class SignInUseCase {
 
       // Message vague pour sécurité (éviter énumération d'emails)
       if (!user) {
-        throw new Error("Email ou mot de passe incorrect");
+        throw new Error('Email ou mot de passe incorrect');
       }
 
       const isPasswordValid = await bcrypt.compare(
@@ -39,7 +39,7 @@ export class SignInUseCase {
       );
 
       if (!isPasswordValid) {
-        throw new Error("Email ou mot de passe incorrect");
+        throw new Error('Email ou mot de passe incorrect');
       }
 
       return {
@@ -51,7 +51,7 @@ export class SignInUseCase {
       if (error instanceof Error) {
         throw error;
       }
-      throw new Error("Impossible de se connecter");
+      throw new Error('Impossible de se connecter');
     }
   }
 
@@ -60,18 +60,18 @@ export class SignInUseCase {
       throw new Error("L'email est requis");
     }
 
-    if (typeof email !== "string" || email.trim().length === 0) {
+    if (typeof email !== 'string' || email.trim().length === 0) {
       throw new Error("L'email est requis");
     }
   }
 
   private validatePassword(password: string): void {
     if (password === undefined || password === null) {
-      throw new Error("Le mot de passe est requis");
+      throw new Error('Le mot de passe est requis');
     }
 
-    if (typeof password !== "string" || password.trim().length === 0) {
-      throw new Error("Le mot de passe est requis");
+    if (typeof password !== 'string' || password.trim().length === 0) {
+      throw new Error('Le mot de passe est requis');
     }
   }
 }

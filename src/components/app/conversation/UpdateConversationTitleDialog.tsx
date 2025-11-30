@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { Edit2, FileText } from "lucide-react";
-import { CustomModal } from "@/components/app/common/CustomModal";
-import { GradientButton } from "@/components/app/common/GradientButton";
-import { IconInput } from "@/components/app/common/IconInput";
-import { updateConversationTitle } from "@/services/conversation/conversation.service";
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { Edit2, FileText } from 'lucide-react';
+import { CustomModal } from '@/components/app/common/CustomModal';
+import { GradientButton } from '@/components/app/common/GradientButton';
+import { IconInput } from '@/components/app/common/IconInput';
+import { updateConversationTitle } from '@/services/conversation/conversation.service';
 
 interface UpdateConversationTitleDialogProps {
   conversationId: string;
@@ -44,9 +44,11 @@ export function UpdateConversationTitleDialog({
   const mutation = useMutation({
     mutationFn: updateConversationTitle,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["conversation", conversationId] });
-      queryClient.invalidateQueries({ queryKey: ["conversations"] });
-      toast.success("Titre modifié avec succès");
+      queryClient.invalidateQueries({
+        queryKey: ['conversation', conversationId],
+      });
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      toast.success('Titre modifié avec succès');
       setIsOpen(false);
       reset();
     },
@@ -98,15 +100,15 @@ export function UpdateConversationTitleDialog({
               error={errors.title?.message}
               helperText="1 à 200 caractères"
               disabled={mutation.isPending}
-              {...register("title", {
-                required: "Le titre est requis",
+              {...register('title', {
+                required: 'Le titre est requis',
                 minLength: {
                   value: 1,
-                  message: "Le titre doit contenir au moins 1 caractère",
+                  message: 'Le titre doit contenir au moins 1 caractère',
                 },
                 maxLength: {
                   value: 200,
-                  message: "Le titre ne peut pas dépasser 200 caractères",
+                  message: 'Le titre ne peut pas dépasser 200 caractères',
                 },
               })}
             />

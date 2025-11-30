@@ -82,7 +82,7 @@ describe('DeleteConversation Integration (E2E - US-5)', () => {
     expect(deletedConversation!.deletedAt).not.toBeNull();
   });
 
-  it('devrait rejeter si la conversation n\'existe pas', async () => {
+  it("devrait rejeter si la conversation n'existe pas", async () => {
     // Étant donné
     const user = await prisma.user.create({
       data: {
@@ -100,7 +100,7 @@ describe('DeleteConversation Integration (E2E - US-5)', () => {
     ).rejects.toThrow('non trouvée');
   });
 
-  it('devrait rejeter si l\'utilisateur n\'est pas le propriétaire', async () => {
+  it("devrait rejeter si l'utilisateur n'est pas le propriétaire", async () => {
     // Étant donné
     const owner = await prisma.user.create({
       data: {
@@ -160,7 +160,7 @@ describe('DeleteConversation Integration (E2E - US-5)', () => {
     ).rejects.toThrow('non trouvée');
   });
 
-  it('devrait ne pas supprimer les autres conversations de l\'utilisateur', async () => {
+  it("devrait ne pas supprimer les autres conversations de l'utilisateur", async () => {
     // Étant donné
     const user = await prisma.user.create({
       data: {

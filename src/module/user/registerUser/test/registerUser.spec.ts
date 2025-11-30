@@ -3,17 +3,17 @@ import { RegisterUserRepository } from '../RegisterUserRepository';
 import { User } from '@/domain/user/User';
 
 class RegisterUserDummyRepository implements RegisterUserRepository {
-  async save(user: User): Promise<string> {
+  async save(_user: User): Promise<string> {
     return 'fake-user-id-123';
   }
 
-  async emailExists(email: string): Promise<boolean> {
+  async emailExists(_email: string): Promise<boolean> {
     return false;
   }
 }
 
 class RegisterUserDummyRepositoryWithExistingEmail implements RegisterUserRepository {
-  async save(user: User): Promise<string> {
+  async save(_user: User): Promise<string> {
     throw new Error('Ne devrait jamais être appelé');
   }
 

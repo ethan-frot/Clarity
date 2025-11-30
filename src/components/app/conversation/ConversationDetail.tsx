@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useQuery } from "@tanstack/react-query";
-import { MessageSquare, ArrowLeft, Clock } from "lucide-react";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { MessageCard } from "./MessageCard";
-import { UpdateConversationTitleDialog } from "./UpdateConversationTitleDialog";
-import { DeleteConversationDialog } from "./DeleteConversationDialog";
-import { fetchConversationById } from "@/services/conversation/conversation.service";
-import { getRelativeTime } from "@/lib/date";
+import { useQuery } from '@tanstack/react-query';
+import { MessageSquare, ArrowLeft, Clock } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { MessageCard } from './MessageCard';
+import { UpdateConversationTitleDialog } from './UpdateConversationTitleDialog';
+import { DeleteConversationDialog } from './DeleteConversationDialog';
+import { fetchConversationById } from '@/services/conversation/conversation.service';
+import { getRelativeTime } from '@/lib/date';
 
 interface ConversationDetailProps {
   conversationId: string;
@@ -25,7 +25,7 @@ export function ConversationDetail({
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["conversation", conversationId],
+    queryKey: ['conversation', conversationId],
     queryFn: () => fetchConversationById(conversationId),
   });
 
@@ -48,7 +48,7 @@ export function ConversationDetail({
             <p className="text-red-400 text-lg">
               {error instanceof Error
                 ? error.message
-                : "Conversation introuvable"}
+                : 'Conversation introuvable'}
             </p>
             <Link
               href="/"
@@ -119,9 +119,9 @@ export function ConversationDetail({
             <MessageSquare className="h-4 w-4" />
             <span>
               {conversation.messages.length === 0
-                ? "Aucune réponse"
+                ? 'Aucune réponse'
                 : `${conversation.messages.length} réponse${
-                    conversation.messages.length > 1 ? "s" : ""
+                    conversation.messages.length > 1 ? 's' : ''
                   }`}
             </span>
           </div>

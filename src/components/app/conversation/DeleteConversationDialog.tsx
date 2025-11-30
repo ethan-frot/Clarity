@@ -1,14 +1,13 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { Trash2, AlertTriangle } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { CustomModal } from "@/components/app/common/CustomModal";
-import { GradientButton } from "@/components/app/common/GradientButton";
-import { deleteConversation } from "@/services/conversation/conversation.service";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { Trash2, AlertTriangle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { CustomModal } from '@/components/app/common/CustomModal';
+import { GradientButton } from '@/components/app/common/GradientButton';
+import { deleteConversation } from '@/services/conversation/conversation.service';
 
 interface DeleteConversationDialogProps {
   conversationId: string;
@@ -26,10 +25,10 @@ export function DeleteConversationDialog({
   const mutation = useMutation({
     mutationFn: deleteConversation,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["conversations"] });
-      toast.success("Conversation supprimée avec succès");
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      toast.success('Conversation supprimée avec succès');
       setIsOpen(false);
-      router.push("/");
+      router.push('/');
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -66,10 +65,10 @@ export function DeleteConversationDialog({
               </h2>
             </div>
             <p className="text-white/70 text-base">
-              Êtes-vous sûr de vouloir supprimer la conversation{" "}
+              Êtes-vous sûr de vouloir supprimer la conversation{' '}
               <span className="text-white font-medium">
-                "{conversationTitle}"
-              </span>{" "}
+                &quot;{conversationTitle}&quot;
+              </span>{' '}
               ?
             </p>
             <p className="text-red-400/80 text-sm">

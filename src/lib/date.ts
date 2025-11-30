@@ -1,5 +1,5 @@
-import { formatDistanceToNow } from "date-fns";
-import { fr } from "date-fns/locale";
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 /**
  * Formate une date en temps relatif en français

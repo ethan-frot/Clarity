@@ -1,4 +1,4 @@
-import { ConversationDetail } from "@/components/app/conversation/ConversationDetail";
+import { ConversationDetail } from '@/components/app/conversation/ConversationDetail';
 
 interface ConversationPageProps {
   params: Promise<{
@@ -6,7 +6,9 @@ interface ConversationPageProps {
   }>;
 }
 
-export default async function ConversationPage({ params }: ConversationPageProps) {
+export default async function ConversationPage({
+  params,
+}: ConversationPageProps) {
   const { id } = await params;
   return <ConversationDetail conversationId={id} />;
 }

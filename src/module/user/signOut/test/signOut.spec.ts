@@ -16,7 +16,7 @@ class SignOutDummyRepository implements SignOutRepository {
 
 describe('SignOutUseCase (US-11)', () => {
   describe('Scénario 1 : Déconnexion réussie avec sessions actives', () => {
-    it('devrait révoquer toutes les sessions actives de l\'utilisateur', async () => {
+    it("devrait révoquer toutes les sessions actives de l'utilisateur", async () => {
       // Étant donné
       const repository = new SignOutDummyRepository();
       const useCase = new SignOutUseCase(repository);
@@ -75,7 +75,7 @@ describe('SignOutUseCase (US-11)', () => {
       // Quand / Alors
       await expect(
         useCase.execute({
-          userId: undefined as any,
+          userId: undefined as unknown as string,
         })
       ).rejects.toThrow('userId');
     });
@@ -90,7 +90,7 @@ describe('SignOutUseCase (US-11)', () => {
       // Quand / Alors
       await expect(
         useCase.execute({
-          userId: null as any,
+          userId: null as unknown as string,
         })
       ).rejects.toThrow('userId');
     });

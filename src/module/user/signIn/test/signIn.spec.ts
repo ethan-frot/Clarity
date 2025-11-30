@@ -41,7 +41,7 @@ describe('SignInUseCase (US-10)', () => {
   });
 
   describe('Scénario 2 : Connexion échouée - email inexistant', () => {
-    it('devrait rejeter un email qui n\'existe pas en base', async () => {
+    it("devrait rejeter un email qui n'existe pas en base", async () => {
       // Étant donné
       const repository = new SignInDummyRepository();
       const useCase = new SignInUseCase(repository);
@@ -113,7 +113,7 @@ describe('SignInUseCase (US-10)', () => {
       // Quand / Alors
       await expect(
         useCase.execute({
-          email: undefined as any,
+          email: undefined as unknown as string,
           password: 'SecureP@ss123',
         })
       ).rejects.toThrow('email');
@@ -130,7 +130,7 @@ describe('SignInUseCase (US-10)', () => {
       await expect(
         useCase.execute({
           email: 'alice@example.com',
-          password: undefined as any,
+          password: undefined as unknown as string,
         })
       ).rejects.toThrow('mot de passe');
     });

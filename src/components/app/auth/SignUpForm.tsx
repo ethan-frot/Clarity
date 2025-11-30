@@ -13,7 +13,7 @@ import {
   NameInput,
   EMAIL_VALIDATION,
   PASSWORD_VALIDATION,
-  NAME_VALIDATION
+  NAME_VALIDATION,
 } from '@/components/app/common/form';
 import { GradientButton } from '@/components/app/common/GradientButton';
 
@@ -73,7 +73,7 @@ export function SignUpForm() {
         router.push('/signin');
       }, 1500);
     } catch (error) {
-      console.error('Erreur lors de l\'inscription:', error);
+      console.error("Erreur lors de l'inscription:", error);
       toast.error('Une erreur inattendue est survenue');
     } finally {
       setIsLoading(false);

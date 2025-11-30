@@ -1,11 +1,9 @@
-import { prisma } from "@/lib/prisma";
-import { UpdateConversationRepository } from "./UpdateConversationRepository";
-import { Conversation } from "@/domain/conversation/Conversation";
-import { PrismaClient } from "@/generated/prisma";
+import { prisma } from '@/lib/prisma';
+import { UpdateConversationRepository } from './UpdateConversationRepository';
+import { Conversation } from '@/domain/conversation/Conversation';
+import { PrismaClient } from '@/generated/prisma';
 
-export class UpdateConversationPrismaRepository
-  implements UpdateConversationRepository
-{
+export class UpdateConversationPrismaRepository implements UpdateConversationRepository {
   private prismaClient: PrismaClient;
 
   constructor(prismaClient?: PrismaClient) {

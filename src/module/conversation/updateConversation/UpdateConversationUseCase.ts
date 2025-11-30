@@ -1,4 +1,4 @@
-import { UpdateConversationRepository } from "./UpdateConversationRepository";
+import { UpdateConversationRepository } from './UpdateConversationRepository';
 
 /**
  * Use Case : Modifier le titre d'une conversation (US-4)
@@ -26,11 +26,11 @@ export class UpdateConversationUseCase {
       );
 
       if (!conversation) {
-        throw new Error("Conversation non trouvée");
+        throw new Error('Conversation non trouvée');
       }
 
       if (conversation.authorId !== command.userId) {
-        throw new Error("Non autorisé");
+        throw new Error('Non autorisé');
       }
 
       conversation.updateTitle(command.newTitle);

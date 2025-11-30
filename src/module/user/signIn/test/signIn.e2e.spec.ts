@@ -1,4 +1,7 @@
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import {
+  PostgreSqlContainer,
+  StartedPostgreSqlContainer,
+} from '@testcontainers/postgresql';
 import { PrismaClient } from '@/generated/prisma';
 import { SignInUseCase } from '../SignInUseCase';
 import { SignInPrismaRepository } from '../SignInPrismaRepository';
@@ -29,7 +32,7 @@ beforeAll(async () => {
   const { execSync } = require('child_process');
   execSync('npx prisma db push --skip-generate', {
     stdio: 'inherit',
-    env: { ...process.env, DATABASE_URL: container.getConnectionUri() }
+    env: { ...process.env, DATABASE_URL: container.getConnectionUri() },
   });
 
   repository = new SignInPrismaRepository(prisma);
@@ -73,7 +76,7 @@ describe('SignIn Integration (E2E - US-10)', () => {
     expect(result).not.toHaveProperty('password');
   });
 
-  it('devrait rejeter un email qui n\'existe pas en base', async () => {
+  it("devrait rejeter un email qui n'existe pas en base", async () => {
     // Étant donné
     const command = {
       email: 'unknown@example.com',
@@ -154,7 +157,7 @@ describe('SignIn Integration (E2E - US-10)', () => {
     expect(result.name).toBeUndefined();
   });
 
-  it('devrait retourner le même message d\'erreur pour email inexistant et password incorrect', async () => {
+  it("devrait retourner le même message d'erreur pour email inexistant et password incorrect", async () => {
     // Étant donné
     const hashedPassword = await hashPassword('CorrectPassword123!');
     await prisma.user.create({

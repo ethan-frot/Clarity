@@ -4,7 +4,10 @@ import { forwardRef } from 'react';
 import { User } from 'lucide-react';
 import { IconInput } from '../IconInput';
 
-interface NameInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'icon'> {
+interface NameInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'type' | 'icon'
+> {
   id?: string;
   label?: string;
   error?: string;
@@ -12,14 +15,17 @@ interface NameInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement
 }
 
 export const NameInput = forwardRef<HTMLInputElement, NameInputProps>(
-  ({
-    id = 'name',
-    label = 'Nom',
-    error,
-    placeholder = 'Alice Dupont',
-    optional = false,
-    ...props
-  }, ref) => {
+  (
+    {
+      id = 'name',
+      label = 'Nom',
+      error,
+      placeholder = 'Alice Dupont',
+      optional = false,
+      ...props
+    },
+    ref
+  ) => {
     return (
       <IconInput
         ref={ref}

@@ -1,5 +1,5 @@
-import { Conversation } from "@/domain/conversation/Conversation";
-import { Message } from "@/domain/message/Message";
+import { Conversation } from '@/domain/conversation/Conversation';
+import { Message } from '@/domain/message/Message';
 
 /**
  * Repository pour la création d'une conversation

@@ -25,7 +25,9 @@ export class RegisterUserUseCase {
 
   async execute(command: RegisterUserCommand): Promise<RegisterUserResult> {
     try {
-      const emailAlreadyExists = await this.repository.emailExists(command.email);
+      const emailAlreadyExists = await this.repository.emailExists(
+        command.email
+      );
       if (emailAlreadyExists) {
         throw new Error('Cet email est déjà utilisé');
       }

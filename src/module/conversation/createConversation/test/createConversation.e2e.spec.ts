@@ -1,4 +1,7 @@
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import {
+  PostgreSqlContainer,
+  StartedPostgreSqlContainer,
+} from '@testcontainers/postgresql';
 import { PrismaClient } from '@/generated/prisma';
 import { CreateConversationUseCase } from '../CreateConversationUseCase';
 import { CreateConversationPrismaRepository } from '../CreateConversationPrismaRepository';
@@ -28,7 +31,7 @@ beforeAll(async () => {
   const { execSync } = require('child_process');
   execSync('npx prisma db push --skip-generate', {
     stdio: 'inherit',
-    env: { ...process.env, DATABASE_URL: container.getConnectionUri() }
+    env: { ...process.env, DATABASE_URL: container.getConnectionUri() },
   });
 
   repository = new CreateConversationPrismaRepository(prisma);

@@ -60,7 +60,9 @@ describe('ListConversationsUseCase (US-2)', () => {
       }),
     ];
 
-    const repository = new ListConversationsDummyRepository(conversationsWithCount);
+    const repository = new ListConversationsDummyRepository(
+      conversationsWithCount
+    );
     const useCase = new ListConversationsUseCase(repository);
 
     // Quand
@@ -102,7 +104,9 @@ describe('ListConversationsUseCase (US-2)', () => {
       }),
     ];
 
-    const repository = new ListConversationsDummyRepository(conversationsWithCount);
+    const repository = new ListConversationsDummyRepository(
+      conversationsWithCount
+    );
     const useCase = new ListConversationsUseCase(repository);
 
     // Quand
@@ -142,7 +146,9 @@ describe('ListConversationsUseCase (US-2)', () => {
       }),
     ];
 
-    const repository = new ListConversationsDummyRepository(conversationsWithCount);
+    const repository = new ListConversationsDummyRepository(
+      conversationsWithCount
+    );
     const useCase = new ListConversationsUseCase(repository);
 
     // Quand

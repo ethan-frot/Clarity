@@ -8,4 +8,8 @@ export { PasswordInput } from './PasswordInput';
 export { NameInput } from './NameInput';
 
 // Règles de validation
-export { EMAIL_VALIDATION, PASSWORD_VALIDATION, NAME_VALIDATION } from './validation';
+export {
+  EMAIL_VALIDATION,
+  PASSWORD_VALIDATION,
+  NAME_VALIDATION,
+} from './validation';

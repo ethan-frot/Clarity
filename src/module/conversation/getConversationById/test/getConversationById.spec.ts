@@ -3,9 +3,13 @@ import { GetConversationByIdRepository } from '../GetConversationByIdRepository'
 import { ConversationWithMessages } from '../types/getConversationById.types';
 
 class GetConversationByIdDummyRepository implements GetConversationByIdRepository {
-  private conversations: Map<string, ConversationWithMessages | null> = new Map();
+  private conversations: Map<string, ConversationWithMessages | null> =
+    new Map();
 
-  setConversation(id: string, conversation: ConversationWithMessages | null): void {
+  setConversation(
+    id: string,
+    conversation: ConversationWithMessages | null
+  ): void {
     this.conversations.set(id, conversation);
   }
 
@@ -95,7 +99,9 @@ describe('GetConversationByIdUseCase (US-3)', () => {
     repository.setConversation('conv-999', null);
 
     // Quand / Alors
-    await expect(useCase.execute('conv-999')).rejects.toThrow('Conversation non trouvée');
+    await expect(useCase.execute('conv-999')).rejects.toThrow(
+      'Conversation non trouvée'
+    );
   });
 
   it('devrait rejeter une conversation supprimée', async () => {
@@ -106,6 +112,8 @@ describe('GetConversationByIdUseCase (US-3)', () => {
     repository.setConversation('conv-456', null);
 
     // Quand / Alors
-    await expect(useCase.execute('conv-456')).rejects.toThrow('Conversation non trouvée');
+    await expect(useCase.execute('conv-456')).rejects.toThrow(
+      'Conversation non trouvée'
+    );
   });
 });

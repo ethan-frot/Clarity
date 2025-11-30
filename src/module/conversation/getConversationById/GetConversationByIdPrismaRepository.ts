@@ -3,9 +3,7 @@ import { PrismaClient } from '@/generated/prisma';
 import { GetConversationByIdRepository } from './GetConversationByIdRepository';
 import { ConversationWithMessages } from './types/getConversationById.types';
 
-export class GetConversationByIdPrismaRepository
-  implements GetConversationByIdRepository
-{
+export class GetConversationByIdPrismaRepository implements GetConversationByIdRepository {
   private prismaClient: PrismaClient;
 
   constructor(prismaClient?: PrismaClient) {

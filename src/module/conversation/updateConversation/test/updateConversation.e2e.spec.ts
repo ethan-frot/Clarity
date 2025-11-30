@@ -1,4 +1,7 @@
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import {
+  PostgreSqlContainer,
+  StartedPostgreSqlContainer,
+} from '@testcontainers/postgresql';
 import { PrismaClient } from '@/generated/prisma';
 import { UpdateConversationUseCase } from '../UpdateConversationUseCase';
 import { UpdateConversationPrismaRepository } from '../UpdateConversationPrismaRepository';
@@ -28,7 +31,7 @@ beforeAll(async () => {
   const { execSync } = require('child_process');
   execSync('npx prisma db push --skip-generate', {
     stdio: 'inherit',
-    env: { ...process.env, DATABASE_URL: container.getConnectionUri() }
+    env: { ...process.env, DATABASE_URL: container.getConnectionUri() },
   });
 
   repository = new UpdateConversationPrismaRepository(prisma);
@@ -47,7 +50,7 @@ beforeEach(async () => {
 });
 
 describe('UpdateConversation Integration (E2E - US-4)', () => {
-  it('devrait modifier le titre d\'une conversation en base de données', async () => {
+  it("devrait modifier le titre d'une conversation en base de données", async () => {
     // Étant donné
     const user = await prisma.user.create({
       data: {
@@ -137,7 +140,7 @@ describe('UpdateConversation Integration (E2E - US-4)', () => {
     await expect(useCase.execute(command)).rejects.toThrow('titre');
   });
 
-  it('devrait rejeter si la conversation n\'existe pas', async () => {
+  it("devrait rejeter si la conversation n'existe pas", async () => {
     // Étant donné
     const user = await prisma.user.create({
       data: {
@@ -153,10 +156,12 @@ describe('UpdateConversation Integration (E2E - US-4)', () => {
     };
 
     // Quand / Alors
-    await expect(useCase.execute(command)).rejects.toThrow('Conversation non trouvée');
+    await expect(useCase.execute(command)).rejects.toThrow(
+      'Conversation non trouvée'
+    );
   });
 
-  it('devrait rejeter si l\'utilisateur n\'est pas le propriétaire', async () => {
+  it("devrait rejeter si l'utilisateur n'est pas le propriétaire", async () => {
     // Étant donné
     const owner = await prisma.user.create({
       data: {

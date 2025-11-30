@@ -1,4 +1,4 @@
-import { Conversation } from "@/domain/conversation/Conversation";
+import { Conversation } from '@/domain/conversation/Conversation';
 
 export interface AuthorInfo {
   id: string;

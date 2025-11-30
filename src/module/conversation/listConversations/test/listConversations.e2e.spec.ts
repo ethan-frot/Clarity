@@ -85,13 +85,25 @@ describe('ListConversations Integration (E2E - US-2)', () => {
     });
 
     await prisma.message.create({
-      data: { content: 'Message 1 conv1', conversationId: conv1.id, authorId: user.id },
+      data: {
+        content: 'Message 1 conv1',
+        conversationId: conv1.id,
+        authorId: user.id,
+      },
     });
     await prisma.message.create({
-      data: { content: 'Message 2 conv1', conversationId: conv1.id, authorId: user.id },
+      data: {
+        content: 'Message 2 conv1',
+        conversationId: conv1.id,
+        authorId: user.id,
+      },
     });
     await prisma.message.create({
-      data: { content: 'Message 1 conv2', conversationId: conv2.id, authorId: user.id },
+      data: {
+        content: 'Message 1 conv2',
+        conversationId: conv2.id,
+        authorId: user.id,
+      },
     });
 
     // Quand
@@ -167,13 +179,25 @@ describe('ListConversations Integration (E2E - US-2)', () => {
     });
 
     await prisma.message.create({
-      data: { content: 'Message 1', conversationId: conv1.id, authorId: user.id },
+      data: {
+        content: 'Message 1',
+        conversationId: conv1.id,
+        authorId: user.id,
+      },
     });
     await prisma.message.create({
-      data: { content: 'Message 2', conversationId: conv1.id, authorId: user.id },
+      data: {
+        content: 'Message 2',
+        conversationId: conv1.id,
+        authorId: user.id,
+      },
     });
     await prisma.message.create({
-      data: { content: 'Message 3', conversationId: conv1.id, authorId: user.id },
+      data: {
+        content: 'Message 3',
+        conversationId: conv1.id,
+        authorId: user.id,
+      },
     });
 
     // Quand

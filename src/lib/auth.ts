@@ -3,18 +3,18 @@
  *
  * Session JWT : 30 jours
  */
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import { SignInUseCase } from "@/module/user/signIn/SignInUseCase";
-import { SignInPrismaRepository } from "@/module/user/signIn/SignInPrismaRepository";
+import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import { SignInUseCase } from '@/module/user/signIn/SignInUseCase';
+import { SignInPrismaRepository } from '@/module/user/signIn/SignInPrismaRepository';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         try {
@@ -36,24 +36,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             name: result.name,
           };
         } catch (error) {
-          console.error("Erreur lors de la connexion:", error);
+          console.error('Erreur lors de la connexion:', error);
           return null;
         }
       },
     }),
   ],
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 jours
   },
   cookies: {
     sessionToken: {
-      name: "next-auth.session-token",
+      name: 'next-auth.session-token',
       options: {
         httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
       },
     },
   },
@@ -72,6 +72,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   pages: {
-    signIn: "/signin",
+    signIn: '/signin',
   },
 });

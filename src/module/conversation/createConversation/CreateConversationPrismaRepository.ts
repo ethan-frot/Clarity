@@ -1,8 +1,8 @@
-import { prisma } from "@/lib/prisma";
-import { CreateConversationRepository } from "./CreateConversationRepository";
-import { Conversation } from "@/domain/conversation/Conversation";
-import { Message } from "@/domain/message/Message";
-import { PrismaClient } from "@/generated/prisma";
+import { prisma } from '@/lib/prisma';
+import { CreateConversationRepository } from './CreateConversationRepository';
+import { Conversation } from '@/domain/conversation/Conversation';
+import { Message } from '@/domain/message/Message';
+import { PrismaClient } from '@/generated/prisma';
 
 /**
  * Implémentation Prisma du repository pour créer une conversation
@@ -10,9 +10,7 @@ import { PrismaClient } from "@/generated/prisma";
  * Pattern : Adapter (Hexagonal Architecture)
  * Utilise une transaction Prisma pour garantir l'atomicité
  */
-export class CreateConversationPrismaRepository
-  implements CreateConversationRepository
-{
+export class CreateConversationPrismaRepository implements CreateConversationRepository {
   private prismaClient: PrismaClient;
 
   constructor(prismaClient?: PrismaClient) {
