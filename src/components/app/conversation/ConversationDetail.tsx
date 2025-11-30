@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { MessageCard } from "./MessageCard";
 import { UpdateConversationTitleDialog } from "./UpdateConversationTitleDialog";
+import { DeleteConversationDialog } from "./DeleteConversationDialog";
 import { fetchConversationById } from "@/services/conversation/conversation.service";
 import { getRelativeTime } from "@/lib/date";
 
@@ -83,10 +84,14 @@ export function ConversationDetail({
       <Card className="bg-white/5 backdrop-blur-sm border-white/10 mb-8">
         <CardHeader className="relative">
           {session?.user?.id === conversation.authorId && (
-            <div className="absolute right-4">
+            <div className="absolute right-4 flex items-center gap-2">
               <UpdateConversationTitleDialog
                 conversationId={conversationId}
                 currentTitle={conversation.title}
+              />
+              <DeleteConversationDialog
+                conversationId={conversationId}
+                conversationTitle={conversation.title}
               />
             </div>
           )}
