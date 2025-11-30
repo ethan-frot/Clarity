@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { SignInForm } from '@/module/user/signIn/ui/SignInForm';
-import { AuthRedirectToast } from '@/components/app/auth/AuthRedirectToast';
+import { AuthRedirectToast } from '@/module/user/signIn/ui/AuthRedirectToast';
 import {
   Card,
   CardContent,
