@@ -65,6 +65,14 @@ interface UpdateConversationResponse {
   success: boolean;
 }
 
+interface DeleteConversationInput {
+  conversationId: string;
+}
+
+interface DeleteConversationResponse {
+  success: boolean;
+}
+
 export async function fetchConversations(): Promise<ListConversationsResponse> {
   const response = await fetch("/api/conversations", {
     method: "GET",
@@ -131,6 +139,24 @@ export async function updateConversationTitle(
     const errorData = await response.json();
     throw new Error(
       errorData.error || "Erreur lors de la mise à jour de la conversation"
+    );
+  }
+
+  return response.json();
+}
+
+export async function deleteConversation(
+  data: DeleteConversationInput
+): Promise<DeleteConversationResponse> {
+  const response = await fetch(`/api/conversations/${data.conversationId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.error || "Erreur lors de la suppression de la conversation"
     );
   }
 
