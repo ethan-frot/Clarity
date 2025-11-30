@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SignUpForm } from '@/components/app/auth/SignUpForm';
+import { SignUpForm } from '@/module/user/registerUser/ui/SignUpForm';
 import {
   Card,
   CardContent,
