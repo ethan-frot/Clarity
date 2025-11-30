@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { SignInForm } from '@/components/app/auth/SignInForm';
+import { SignInForm } from '@/module/user/signIn/ui/SignInForm';
 import { AuthRedirectToast } from '@/components/app/auth/AuthRedirectToast';
 import {
   Card,
