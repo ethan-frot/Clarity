@@ -1,4 +1,4 @@
-import { ConversationDetail } from '@/components/app/conversation/ConversationDetail';
+import { ConversationDetail } from '@/module/conversation/getConversationById/ui/ConversationDetail';
 
 interface ConversationPageProps {
   params: Promise<{

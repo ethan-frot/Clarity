@@ -5,9 +5,9 @@ import { MessageSquare, ArrowLeft, Clock } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { MessageCard } from './MessageCard';
-import { UpdateConversationTitleDialog } from '../../../module/conversation/updateConversation/ui/UpdateConversationTitleDialog';
-import { DeleteConversationDialog } from '../../../module/conversation/deleteConversation/ui/DeleteConversationDialog';
+import { MessageCard } from '../../../../components/app/conversation/MessageCard';
+import { UpdateConversationTitleDialog } from '@/module/conversation/updateConversation/ui/UpdateConversationTitleDialog';
+import { DeleteConversationDialog } from '@/module/conversation/deleteConversation/ui/DeleteConversationDialog';
 import { fetchConversationById } from '@/services/conversation/conversation.service';
 import { getRelativeTime } from '@/lib/date';
 
