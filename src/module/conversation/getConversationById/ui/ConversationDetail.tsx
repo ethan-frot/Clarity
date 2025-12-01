@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { MessageCard } from './MessageCard';
 import { UpdateConversationTitleDialog } from '@/module/conversation/updateConversation/ui/UpdateConversationTitleDialog';
 import { DeleteConversationDialog } from '@/module/conversation/deleteConversation/ui/DeleteConversationDialog';
+import { CreateMessageForm } from '@/module/message/createMessage/ui/CreateMessageForm';
 import { fetchConversationById } from '@/services/conversation/conversation.service';
 import { getRelativeTime } from '@/lib/date';
 
@@ -148,6 +149,12 @@ export function ConversationDetail({
             {conversation.messages.map((message) => (
               <MessageCard key={message.id} message={message} />
             ))}
+          </div>
+        )}
+
+        {session?.user && (
+          <div className="mt-8">
+            <CreateMessageForm conversationId={conversationId} />
           </div>
         )}
       </div>
