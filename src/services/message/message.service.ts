@@ -15,3 +15,21 @@ export async function createMessage(data: {
 
   return response.json();
 }
+
+export async function updateMessage(data: {
+  messageId: string;
+  content: string;
+}): Promise<{ success: boolean }> {
+  const response = await fetch(`/api/messages/${data.messageId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content: data.content }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Erreur lors de la mise à jour du message');
+  }
+
+  return response.json();
+}
