@@ -5,7 +5,7 @@ import {
 import { PrismaClient } from '@/generated/prisma';
 import { RegisterUserUseCase } from '../RegisterUserUseCase';
 import { RegisterUserPrismaRepository } from '../RegisterUserPrismaRepository';
-import { verifyPassword } from '@/lib/password';
+import { verifyPassword } from '@/lib/auth/password';
 
 let container: StartedPostgreSqlContainer;
 let prisma: PrismaClient;

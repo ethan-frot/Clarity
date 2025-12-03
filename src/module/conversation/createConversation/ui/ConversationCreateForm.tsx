@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession } from '@/lib/auth/auth-client';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { MessageSquare, FileText, Plus } from 'lucide-react';
@@ -25,7 +25,7 @@ export function ConversationCreateForm({
   onSuccess,
 }: ConversationCreateFormProps) {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session, isPending } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,7 +37,7 @@ export function ConversationCreateForm({
   } = useForm<ConversationCreateFormData>();
 
   const handleOpen = () => {
-    if (status !== 'loading' && !session) {
+    if (!isPending && !session) {
       router.push('/signin?reason=create-conversation&redirect=/');
       return;
     }

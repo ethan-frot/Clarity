@@ -6,7 +6,7 @@
  */
 import { RegisterUserRepository } from './RegisterUserRepository';
 import { User } from '@/domain/user/User';
-import { hashPassword } from '@/lib/password';
+import { hashPassword } from '@/lib/auth/password';
 
 export interface RegisterUserCommand {
   email: string;

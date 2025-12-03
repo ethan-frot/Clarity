@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { MessageSquare, ArrowLeft, Clock } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { useSession } from '@/lib/auth/auth-client';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { MessageCard } from './MessageCard';

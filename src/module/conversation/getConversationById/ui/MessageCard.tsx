@@ -1,7 +1,7 @@
 'use client';
 
 import { Clock } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { useSession } from '@/lib/auth/auth-client';
 import { Card, CardContent } from '@/components/ui/card';
 import { getRelativeTime } from '@/lib/date';
 import { UpdateMessageDialog } from '@/module/message/updateMessage/ui/UpdateMessageDialog';
