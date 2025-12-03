@@ -56,7 +56,6 @@ model User {
     name          String?
     avatar        String?
     bio           String?
-    image         String?
 
     conversations  Conversation[]
     messages       Message[]
