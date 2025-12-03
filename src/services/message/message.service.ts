@@ -33,3 +33,18 @@ export async function updateMessage(data: {
 
   return response.json();
 }
+
+export async function deleteMessage(data: {
+  messageId: string;
+}): Promise<{ success: boolean }> {
+  const response = await fetch(`/api/messages/${data.messageId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Erreur lors de la suppression du message');
+  }
+
+  return response.json();
+}
