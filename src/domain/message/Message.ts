@@ -42,6 +42,10 @@ export class Message {
     this.content = newContent;
   }
 
+  delete(): void {
+    (this.deletedAt as Date | null) = new Date();
+  }
+
   private validateContent(content: string): void {
     if (!content || content.trim().length === 0) {
       throw new Error('Le contenu ne peut pas être vide');
