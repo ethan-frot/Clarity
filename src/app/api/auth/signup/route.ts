@@ -1,11 +1,17 @@
 /**
  * POST /api/auth/signup - Inscription utilisateur (US-9)
  *
+ * Hybride Better Auth + Clean Architecture :
+ * 1. RegisterUserUseCase gère la logique métier et validation
+ * 2. Better Auth crée la session automatiquement après inscription
+ *
  * Status : 201 Created | 400 Bad Request | 409 Conflict
  */
 import { NextRequest } from 'next/server';
 import { RegisterUserUseCase } from '@/module/user/registerUser/RegisterUserUseCase';
 import { RegisterUserPrismaRepository } from '@/module/user/registerUser/RegisterUserPrismaRepository';
+import { auth } from '@/lib/auth/better-auth';
+import { headers } from 'next/headers';
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,6 +32,12 @@ export async function POST(request: NextRequest) {
       email,
       password,
       name,
+    });
+
+    // Créer une session Better Auth après inscription réussie
+    await auth.api.signInEmail({
+      body: { email, password },
+      headers: await headers(),
     });
 
     return Response.json(
