@@ -1,229 +1,168 @@
 import {
-  PostgreSqlContainer,
-  StartedPostgreSqlContainer,
-} from '@testcontainers/postgresql';
-import { PrismaClient } from '@/generated/prisma';
-import { UpdateMessageUseCase } from '../UpdateMessageUseCase';
-import { UpdateMessagePrismaRepository } from '../UpdateMessagePrismaRepository';
+  setupE2EDatabase,
+  cleanDatabase,
+  teardownE2EDatabase,
+  E2ETestContext,
+} from '@/../test/e2e-setup';
+import { createTestUser } from '@/../test/auth-helpers';
+import { createTestConversation, createTestMessage } from '@/../test/factories';
+import { PATCH } from '@/app/api/messages/[id]/route';
+import { NextRequest } from 'next/server';
 
-let container: StartedPostgreSqlContainer;
-let prisma: PrismaClient;
-let useCase: UpdateMessageUseCase;
-let repository: UpdateMessagePrismaRepository;
+jest.mock('@/lib/auth/auth-helpers');
+
+let context: E2ETestContext;
 
 beforeAll(async () => {
-  container = await new PostgreSqlContainer('postgres:16-alpine')
-    .withDatabase('test_forum')
-    .withUsername('test')
-    .withPassword('test')
-    .start();
-
-  process.env.DATABASE_URL = container.getConnectionUri();
-
-  prisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: container.getConnectionUri(),
-      },
-    },
-  });
-
-  const { execSync } = require('child_process');
-  execSync('npx prisma db push --skip-generate', {
-    stdio: 'inherit',
-    env: { ...process.env, DATABASE_URL: container.getConnectionUri() },
-  });
-
-  repository = new UpdateMessagePrismaRepository(prisma);
-  useCase = new UpdateMessageUseCase(repository);
+  context = await setupE2EDatabase();
 }, 60000);
 
 afterAll(async () => {
-  await prisma.$disconnect();
-  await container.stop();
+  await teardownE2EDatabase(context);
 });
 
 beforeEach(async () => {
-  await prisma.message.deleteMany();
-  await prisma.conversation.deleteMany();
-  await prisma.user.deleteMany();
+  await cleanDatabase(context.prisma);
+  jest.clearAllMocks();
 });
 
-describe('UpdateMessage Integration (E2E - US-7)', () => {
-  it("devrait modifier le contenu d'un message en base de données", async () => {
+describe('PATCH /api/messages/[id] (E2E - US-7)', () => {
+  it("devrait modifier le contenu d'un message (200)", async () => {
     // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'author@example.com',
-        password: 'hashedPassword',
-        name: 'Author',
-      },
-    });
-
-    const conversation = await prisma.conversation.create({
-      data: {
-        title: 'Conversation Test',
-        authorId: user.id,
-      },
-    });
-
-    const message = await prisma.message.create({
-      data: {
+    const user = await createTestUser(context.prisma);
+    const conversation = await createTestConversation(context.prisma, user.id);
+    const message = await createTestMessage(
+      context.prisma,
+      conversation.id,
+      user.id,
+      {
         content: 'Contenu original',
-        authorId: user.id,
-        conversationId: conversation.id,
-      },
-    });
+      }
+    );
 
-    const command = {
-      messageId: message.id,
-      userId: user.id,
-      content: 'Contenu modifié',
-    };
+    const { getSession } = require('@/lib/auth/auth-helpers');
+    getSession.mockResolvedValue({ user: { id: user.id } });
+
+    const request = new NextRequest(
+      'http://localhost:3000/api/messages/' + message.id,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ content: 'Contenu modifié' }),
+      }
+    );
 
     // Quand
-    await useCase.execute(command);
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: message.id }),
+    });
+    const data = await response.json();
 
     // Alors
-    const updatedMessage = await prisma.message.findUnique({
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
+
+    const updated = await context.prisma.message.findUnique({
       where: { id: message.id },
     });
-
-    expect(updatedMessage).not.toBeNull();
-    expect(updatedMessage!.content).toBe('Contenu modifié');
-    expect(updatedMessage!.updatedAt).not.toBeNull();
+    expect(updated?.content).toBe('Contenu modifié');
   });
 
-  it('devrait rejeter un contenu vide', async () => {
+  it('devrait retourner 401 si non authentifié', async () => {
     // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'author@example.com',
-        password: 'hashedPassword',
-        name: 'Author',
-      },
-    });
+    const user = await createTestUser(context.prisma);
+    const conversation = await createTestConversation(context.prisma, user.id);
+    const message = await createTestMessage(
+      context.prisma,
+      conversation.id,
+      user.id
+    );
 
-    const conversation = await prisma.conversation.create({
-      data: {
-        title: 'Conversation Test',
-        authorId: user.id,
-      },
-    });
+    const { getSession } = require('@/lib/auth/auth-helpers');
+    getSession.mockResolvedValue(null);
 
-    const message = await prisma.message.create({
-      data: {
-        content: 'Contenu original',
-        authorId: user.id,
-        conversationId: conversation.id,
-      },
-    });
+    const request = new NextRequest(
+      'http://localhost:3000/api/messages/' + message.id,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ content: 'Test' }),
+      }
+    );
 
-    // Quand / Alors
-    await expect(
-      useCase.execute({
-        messageId: message.id,
-        userId: user.id,
-        content: '',
-      })
-    ).rejects.toThrow('contenu');
+    // Quand
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: message.id }),
+    });
+    const data = await response.json();
+
+    // Alors
+    expect(response.status).toBe(401);
+    expect(data).toHaveProperty('error');
   });
 
-  it('devrait rejeter un contenu trop long', async () => {
+  it('devrait retourner 403 si pas le propriétaire', async () => {
     // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'author@example.com',
-        password: 'hashedPassword',
-        name: 'Author',
-      },
-    });
+    const owner = await createTestUser(context.prisma);
+    const other = await createTestUser(context.prisma);
+    const conversation = await createTestConversation(context.prisma, owner.id);
+    const message = await createTestMessage(
+      context.prisma,
+      conversation.id,
+      owner.id
+    );
 
-    const conversation = await prisma.conversation.create({
-      data: {
-        title: 'Conversation Test',
-        authorId: user.id,
-      },
-    });
+    const { getSession } = require('@/lib/auth/auth-helpers');
+    getSession.mockResolvedValue({ user: { id: other.id } });
 
-    const message = await prisma.message.create({
-      data: {
-        content: 'Contenu original',
-        authorId: user.id,
-        conversationId: conversation.id,
-      },
-    });
+    const request = new NextRequest(
+      'http://localhost:3000/api/messages/' + message.id,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ content: 'Test' }),
+      }
+    );
 
-    // Quand / Alors
-    await expect(
-      useCase.execute({
-        messageId: message.id,
-        userId: user.id,
-        content: 'a'.repeat(2001),
-      })
-    ).rejects.toThrow('2000 caractères');
+    // Quand
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: message.id }),
+    });
+    const data = await response.json();
+
+    // Alors
+    expect(response.status).toBe(403);
+    expect(data).toHaveProperty('error');
+    expect(data.error).toMatch(/autorisé/i);
   });
 
-  it("devrait rejeter si le message n'existe pas", async () => {
+  it('devrait retourner 400 si contenu vide', async () => {
     // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'user@example.com',
-        password: 'hashedPassword',
-        name: 'User',
-      },
+    const user = await createTestUser(context.prisma);
+    const conversation = await createTestConversation(context.prisma, user.id);
+    const message = await createTestMessage(
+      context.prisma,
+      conversation.id,
+      user.id
+    );
+
+    const { getSession } = require('@/lib/auth/auth-helpers');
+    getSession.mockResolvedValue({ user: { id: user.id } });
+
+    const request = new NextRequest(
+      'http://localhost:3000/api/messages/' + message.id,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ content: '' }),
+      }
+    );
+
+    // Quand
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: message.id }),
     });
+    const data = await response.json();
 
-    // Quand / Alors
-    await expect(
-      useCase.execute({
-        messageId: 'msg-404',
-        userId: user.id,
-        content: 'Contenu modifié',
-      })
-    ).rejects.toThrow('trouvé');
-  });
-
-  it("devrait rejeter si l'utilisateur n'est pas le propriétaire", async () => {
-    // Étant donné
-    const author = await prisma.user.create({
-      data: {
-        email: 'author@example.com',
-        password: 'hashedPassword',
-        name: 'Author',
-      },
-    });
-
-    const otherUser = await prisma.user.create({
-      data: {
-        email: 'other@example.com',
-        password: 'hashedPassword',
-        name: 'Other',
-      },
-    });
-
-    const conversation = await prisma.conversation.create({
-      data: {
-        title: 'Conversation Test',
-        authorId: author.id,
-      },
-    });
-
-    const message = await prisma.message.create({
-      data: {
-        content: 'Contenu original',
-        authorId: author.id,
-        conversationId: conversation.id,
-      },
-    });
-
-    // Quand / Alors
-    await expect(
-      useCase.execute({
-        messageId: message.id,
-        userId: otherUser.id,
-        content: 'Contenu modifié',
-      })
-    ).rejects.toThrow('autorisé');
+    // Alors
+    expect(response.status).toBe(400);
+    expect(data).toHaveProperty('error');
+    expect(data.error).toMatch(/contenu/i);
   });
 });

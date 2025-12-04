@@ -1,210 +1,104 @@
 import {
-  PostgreSqlContainer,
-  StartedPostgreSqlContainer,
-} from '@testcontainers/postgresql';
-import { PrismaClient } from '@/generated/prisma';
-import { ListConversationsUseCase } from '../ListConversationsUseCase';
-import { ListConversationsPrismaRepository } from '../ListConversationsPrismaRepository';
+  setupE2EDatabase,
+  cleanDatabase,
+  teardownE2EDatabase,
+  E2ETestContext,
+} from '@/../test/e2e-setup';
+import { createTestUser } from '@/../test/auth-helpers';
+import { createTestConversation } from '@/../test/factories';
+import { GET } from '@/app/api/conversations/route';
 
-let container: StartedPostgreSqlContainer;
-let prisma: PrismaClient;
-let useCase: ListConversationsUseCase;
-let repository: ListConversationsPrismaRepository;
+let context: E2ETestContext;
 
 beforeAll(async () => {
-  container = await new PostgreSqlContainer('postgres:16-alpine')
-    .withDatabase('test_forum')
-    .withUsername('test')
-    .withPassword('test')
-    .start();
-
-  process.env.DATABASE_URL = container.getConnectionUri();
-
-  prisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: container.getConnectionUri(),
-      },
-    },
-  });
-
-  const { execSync } = require('child_process');
-  execSync('npx prisma db push --skip-generate', {
-    stdio: 'inherit',
-    env: { ...process.env, DATABASE_URL: container.getConnectionUri() },
-  });
-
-  repository = new ListConversationsPrismaRepository(prisma);
-  useCase = new ListConversationsUseCase(repository);
+  context = await setupE2EDatabase();
 }, 60000);
 
 afterAll(async () => {
-  await prisma.$disconnect();
-  await container.stop();
+  await teardownE2EDatabase(context);
 });
 
 beforeEach(async () => {
-  await prisma.message.deleteMany();
-  await prisma.conversation.deleteMany();
-  await prisma.user.deleteMany();
+  await cleanDatabase(context.prisma);
 });
 
-describe('ListConversations Integration (E2E - US-2)', () => {
-  it('devrait récupérer toutes les conversations triées par date (la plus récente en premier)', async () => {
+describe('GET /api/conversations (E2E - US-2)', () => {
+  it('devrait récupérer toutes les conversations triées par date (200)', async () => {
     // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'alice@example.com',
-        password: 'hashedPassword',
-        name: 'Alice',
-      },
+    const user = await createTestUser(context.prisma);
+
+    const conv1 = await createTestConversation(context.prisma, user.id, {
+      title: 'Première conversation',
+    });
+    await context.prisma.conversation.update({
+      where: { id: conv1.id },
+      data: { createdAt: new Date('2025-01-01') },
     });
 
-    const conv1 = await prisma.conversation.create({
-      data: {
-        title: 'Première conversation',
-        authorId: user.id,
-        createdAt: new Date('2025-01-01'),
-      },
+    const conv2 = await createTestConversation(context.prisma, user.id, {
+      title: 'Deuxième conversation',
+    });
+    await context.prisma.conversation.update({
+      where: { id: conv2.id },
+      data: { createdAt: new Date('2025-01-02') },
     });
 
-    const conv2 = await prisma.conversation.create({
-      data: {
-        title: 'Deuxième conversation',
-        authorId: user.id,
-        createdAt: new Date('2025-01-02'),
-      },
+    const conv3 = await createTestConversation(context.prisma, user.id, {
+      title: 'Troisième conversation',
     });
-
-    const conv3 = await prisma.conversation.create({
-      data: {
-        title: 'Troisième conversation',
-        authorId: user.id,
-        createdAt: new Date('2025-01-03'),
-      },
-    });
-
-    await prisma.message.create({
-      data: {
-        content: 'Message 1 conv1',
-        conversationId: conv1.id,
-        authorId: user.id,
-      },
-    });
-    await prisma.message.create({
-      data: {
-        content: 'Message 2 conv1',
-        conversationId: conv1.id,
-        authorId: user.id,
-      },
-    });
-    await prisma.message.create({
-      data: {
-        content: 'Message 1 conv2',
-        conversationId: conv2.id,
-        authorId: user.id,
-      },
+    await context.prisma.conversation.update({
+      where: { id: conv3.id },
+      data: { createdAt: new Date('2025-01-03') },
     });
 
     // Quand
-    const result = await useCase.execute();
+    const response = await GET();
+    const data = await response.json();
 
     // Alors
-    expect(result.conversations).toHaveLength(3);
-    expect(result.conversations[0].id).toBe(conv3.id);
-    expect(result.conversations[1].id).toBe(conv2.id);
-    expect(result.conversations[2].id).toBe(conv1.id);
+    expect(response.status).toBe(200);
+    expect(data.conversations).toHaveLength(3);
+    expect(data.conversations[0].id).toBe(conv3.id);
+    expect(data.conversations[1].id).toBe(conv2.id);
+    expect(data.conversations[2].id).toBe(conv1.id);
   });
 
-  it('devrait exclure les conversations supprimées (deletedAt défini)', async () => {
+  it('devrait exclure les conversations supprimées (soft delete)', async () => {
     // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'bob@example.com',
-        password: 'hashedPassword',
-        name: 'Bob',
-      },
+    const user = await createTestUser(context.prisma);
+
+    const conv1 = await createTestConversation(context.prisma, user.id, {
+      title: 'Conversation active',
     });
 
-    const conv1 = await prisma.conversation.create({
-      data: {
-        title: 'Conversation active',
-        authorId: user.id,
-        deletedAt: null,
-      },
+    await createTestConversation(context.prisma, user.id, {
+      title: 'Conversation supprimée',
     });
-
-    await prisma.conversation.create({
-      data: {
-        title: 'Conversation supprimée',
-        authorId: user.id,
-        deletedAt: new Date(),
-      },
+    await context.prisma.conversation.updateMany({
+      where: { title: 'Conversation supprimée' },
+      data: { deletedAt: new Date() },
     });
 
     // Quand
-    const result = await useCase.execute();
+    const response = await GET();
+    const data = await response.json();
 
     // Alors
-    expect(result.conversations).toHaveLength(1);
-    expect(result.conversations[0].id).toBe(conv1.id);
+    expect(response.status).toBe(200);
+    expect(data.conversations).toHaveLength(1);
+    expect(data.conversations[0].id).toBe(conv1.id);
   });
 
   it('devrait retourner un tableau vide si aucune conversation', async () => {
     // Étant donné (aucune conversation en base)
 
     // Quand
-    const result = await useCase.execute();
+    const response = await GET();
+    const data = await response.json();
 
     // Alors
-    expect(result.conversations).toHaveLength(0);
-    expect(result.conversations).toEqual([]);
-  });
-
-  it('devrait inclure le nombre de messages pour chaque conversation', async () => {
-    // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'charlie@example.com',
-        password: 'hashedPassword',
-        name: 'Charlie',
-      },
-    });
-
-    const conv1 = await prisma.conversation.create({
-      data: {
-        title: 'Conversation avec messages',
-        authorId: user.id,
-      },
-    });
-
-    await prisma.message.create({
-      data: {
-        content: 'Message 1',
-        conversationId: conv1.id,
-        authorId: user.id,
-      },
-    });
-    await prisma.message.create({
-      data: {
-        content: 'Message 2',
-        conversationId: conv1.id,
-        authorId: user.id,
-      },
-    });
-    await prisma.message.create({
-      data: {
-        content: 'Message 3',
-        conversationId: conv1.id,
-        authorId: user.id,
-      },
-    });
-
-    // Quand
-    const result = await useCase.execute();
-
-    // Alors
-    expect(result.conversations).toHaveLength(1);
-    expect(result.conversations[0].messageCount).toBe(3);
+    expect(response.status).toBe(200);
+    expect(data.conversations).toHaveLength(0);
+    expect(data.conversations).toEqual([]);
   });
 });

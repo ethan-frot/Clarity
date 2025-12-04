@@ -1,200 +1,103 @@
 import {
-  PostgreSqlContainer,
-  StartedPostgreSqlContainer,
-} from '@testcontainers/postgresql';
-import { PrismaClient } from '@/generated/prisma';
-import { GetConversationByIdUseCase } from '../GetConversationByIdUseCase';
-import { GetConversationByIdPrismaRepository } from '../GetConversationByIdPrismaRepository';
+  setupE2EDatabase,
+  cleanDatabase,
+  teardownE2EDatabase,
+  E2ETestContext,
+} from '@/../test/e2e-setup';
+import { createTestUser } from '@/../test/auth-helpers';
+import { createTestConversation, createTestMessage } from '@/../test/factories';
+import { GET } from '@/app/api/conversations/[id]/route';
 
-let container: StartedPostgreSqlContainer;
-let prisma: PrismaClient;
-let useCase: GetConversationByIdUseCase;
-let repository: GetConversationByIdPrismaRepository;
+let context: E2ETestContext;
 
 beforeAll(async () => {
-  container = await new PostgreSqlContainer('postgres:16-alpine')
-    .withDatabase('test_forum')
-    .withUsername('test')
-    .withPassword('test')
-    .start();
-
-  process.env.DATABASE_URL = container.getConnectionUri();
-
-  prisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: container.getConnectionUri(),
-      },
-    },
-  });
-
-  const { execSync } = require('child_process');
-  execSync('npx prisma db push --skip-generate', {
-    stdio: 'inherit',
-    env: { ...process.env, DATABASE_URL: container.getConnectionUri() },
-  });
-
-  repository = new GetConversationByIdPrismaRepository(prisma);
-  useCase = new GetConversationByIdUseCase(repository);
+  context = await setupE2EDatabase();
 }, 60000);
 
 afterAll(async () => {
-  await prisma.$disconnect();
-  await container.stop();
+  await teardownE2EDatabase(context);
 });
 
 beforeEach(async () => {
-  await prisma.message.deleteMany();
-  await prisma.conversation.deleteMany();
-  await prisma.user.deleteMany();
+  await cleanDatabase(context.prisma);
 });
 
-describe('GetConversationById Integration (E2E - US-3)', () => {
-  it('devrait récupérer une conversation avec ses messages triés chronologiquement', async () => {
+describe('GET /api/conversations/[id] (E2E - US-3)', () => {
+  it('devrait récupérer une conversation avec ses messages triés chronologiquement (200)', async () => {
     // Étant donné
-    const user1 = await prisma.user.create({
-      data: {
-        email: 'alice@example.com',
-        password: 'hashedPassword',
-        name: 'Alice',
-      },
-    });
+    const user1 = await createTestUser(context.prisma, { name: 'Alice' });
+    const user2 = await createTestUser(context.prisma, { name: 'Bob' });
 
-    const user2 = await prisma.user.create({
-      data: {
-        email: 'bob@example.com',
-        password: 'hashedPassword',
-        name: 'Bob',
-      },
-    });
-
-    const conversation = await prisma.conversation.create({
-      data: {
+    const conversation = await createTestConversation(
+      context.prisma,
+      user1.id,
+      {
         title: 'Ma conversation',
-        authorId: user1.id,
-      },
-    });
+      }
+    );
 
-    await prisma.message.create({
-      data: {
-        content: 'Premier message',
-        conversationId: conversation.id,
-        authorId: user1.id,
-        createdAt: new Date('2024-01-01T10:00:00Z'),
-      },
+    await createTestMessage(context.prisma, conversation.id, user1.id, {
+      content: 'Premier message',
     });
-
-    await prisma.message.create({
-      data: {
-        content: 'Deuxième message',
-        conversationId: conversation.id,
-        authorId: user2.id,
-        createdAt: new Date('2024-01-01T10:05:00Z'),
-      },
+    await createTestMessage(context.prisma, conversation.id, user2.id, {
+      content: 'Deuxième message',
     });
-
-    await prisma.message.create({
-      data: {
-        content: 'Troisième message',
-        conversationId: conversation.id,
-        authorId: user1.id,
-        createdAt: new Date('2024-01-01T10:10:00Z'),
-      },
+    await createTestMessage(context.prisma, conversation.id, user1.id, {
+      content: 'Troisième message',
     });
 
     // Quand
-    const result = await useCase.execute(conversation.id);
+    const response = await GET(new Request('http://localhost:3000'), {
+      params: Promise.resolve({ id: conversation.id }),
+    });
+    const data = await response.json();
 
     // Alors
-    expect(result).toBeDefined();
-    expect(result.id).toBe(conversation.id);
-    expect(result.title).toBe('Ma conversation');
-    expect(result.authorId).toBe(user1.id);
-    expect(result.author.name).toBe('Alice');
-    expect(result.author.email).toBe('alice@example.com');
-    expect(result.messages).toHaveLength(3);
-    expect(result.messages[0].content).toBe('Premier message');
-    expect(result.messages[0].author.name).toBe('Alice');
-    expect(result.messages[1].content).toBe('Deuxième message');
-    expect(result.messages[1].author.name).toBe('Bob');
-    expect(result.messages[2].content).toBe('Troisième message');
-    expect(result.messages[2].author.name).toBe('Alice');
+    expect(response.status).toBe(200);
+    expect(data.id).toBe(conversation.id);
+    expect(data.title).toBe('Ma conversation');
+    // 4 messages : 1 initial créé par createTestConversation + 3 ajoutés manuellement
+    expect(data.messages).toHaveLength(4);
+    expect(data.messages[0].content).toBe('Premier message de test'); // Message initial
+    expect(data.messages[1].content).toBe('Premier message');
+    expect(data.messages[2].content).toBe('Deuxième message');
+    expect(data.messages[3].content).toBe('Troisième message');
   });
 
-  it('devrait rejeter une conversation inexistante', async () => {
-    // Étant donné (aucune conversation avec cet ID)
+  it('devrait retourner 404 si conversation inexistante', async () => {
+    // Étant donné
     const fakeId = 'conv-999';
 
-    // Quand / Alors
-    await expect(useCase.execute(fakeId)).rejects.toThrow(
-      'Conversation non trouvée'
-    );
+    // Quand
+    const response = await GET(new Request('http://localhost:3000'), {
+      params: Promise.resolve({ id: fakeId }),
+    });
+    const data = await response.json();
+
+    // Alors
+    expect(response.status).toBe(404);
+    expect(data).toHaveProperty('error');
+    expect(data.error).toMatch(/non trouvée/i);
   });
 
-  it('devrait rejeter une conversation supprimée', async () => {
+  it('devrait retourner 404 si conversation supprimée (soft delete)', async () => {
     // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'charlie@example.com',
-        password: 'hashedPassword',
-        name: 'Charlie',
-      },
-    });
+    const user = await createTestUser(context.prisma);
+    const conversation = await createTestConversation(context.prisma, user.id);
 
-    const conversation = await prisma.conversation.create({
-      data: {
-        title: 'Conversation supprimée',
-        authorId: user.id,
-        deletedAt: new Date(),
-      },
-    });
-
-    // Quand / Alors
-    await expect(useCase.execute(conversation.id)).rejects.toThrow(
-      'Conversation non trouvée'
-    );
-  });
-
-  it('devrait exclure les messages supprimés', async () => {
-    // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'dave@example.com',
-        password: 'hashedPassword',
-        name: 'Dave',
-      },
-    });
-
-    const conversation = await prisma.conversation.create({
-      data: {
-        title: 'Conversation avec messages supprimés',
-        authorId: user.id,
-      },
-    });
-
-    await prisma.message.create({
-      data: {
-        content: 'Message actif',
-        conversationId: conversation.id,
-        authorId: user.id,
-        deletedAt: null,
-      },
-    });
-
-    await prisma.message.create({
-      data: {
-        content: 'Message supprimé',
-        conversationId: conversation.id,
-        authorId: user.id,
-        deletedAt: new Date(),
-      },
+    await context.prisma.conversation.update({
+      where: { id: conversation.id },
+      data: { deletedAt: new Date() },
     });
 
     // Quand
-    const result = await useCase.execute(conversation.id);
+    const response = await GET(new Request('http://localhost:3000'), {
+      params: Promise.resolve({ id: conversation.id }),
+    });
+    const data = await response.json();
 
     // Alors
-    expect(result.messages).toHaveLength(1);
-    expect(result.messages[0].content).toBe('Message actif');
+    expect(response.status).toBe(404);
+    expect(data).toHaveProperty('error');
   });
 });

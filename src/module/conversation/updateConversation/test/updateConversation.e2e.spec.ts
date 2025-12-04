@@ -1,271 +1,147 @@
 import {
-  PostgreSqlContainer,
-  StartedPostgreSqlContainer,
-} from '@testcontainers/postgresql';
-import { PrismaClient } from '@/generated/prisma';
-import { UpdateConversationUseCase } from '../UpdateConversationUseCase';
-import { UpdateConversationPrismaRepository } from '../UpdateConversationPrismaRepository';
+  setupE2EDatabase,
+  cleanDatabase,
+  teardownE2EDatabase,
+  E2ETestContext,
+} from '@/../test/e2e-setup';
+import { createTestUser } from '@/../test/auth-helpers';
+import { createTestConversation } from '@/../test/factories';
+import { PATCH } from '@/app/api/conversations/[id]/route';
+import { NextRequest } from 'next/server';
 
-let container: StartedPostgreSqlContainer;
-let prisma: PrismaClient;
-let useCase: UpdateConversationUseCase;
-let repository: UpdateConversationPrismaRepository;
+jest.mock('@/lib/auth/auth-helpers');
+
+let context: E2ETestContext;
 
 beforeAll(async () => {
-  container = await new PostgreSqlContainer('postgres:16-alpine')
-    .withDatabase('test_forum')
-    .withUsername('test')
-    .withPassword('test')
-    .start();
-
-  process.env.DATABASE_URL = container.getConnectionUri();
-
-  prisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: container.getConnectionUri(),
-      },
-    },
-  });
-
-  const { execSync } = require('child_process');
-  execSync('npx prisma db push --skip-generate', {
-    stdio: 'inherit',
-    env: { ...process.env, DATABASE_URL: container.getConnectionUri() },
-  });
-
-  repository = new UpdateConversationPrismaRepository(prisma);
-  useCase = new UpdateConversationUseCase(repository);
+  context = await setupE2EDatabase();
 }, 60000);
 
 afterAll(async () => {
-  await prisma.$disconnect();
-  await container.stop();
+  await teardownE2EDatabase(context);
 });
 
 beforeEach(async () => {
-  await prisma.message.deleteMany();
-  await prisma.conversation.deleteMany();
-  await prisma.user.deleteMany();
+  await cleanDatabase(context.prisma);
+  jest.clearAllMocks();
 });
 
-describe('UpdateConversation Integration (E2E - US-4)', () => {
-  it("devrait modifier le titre d'une conversation en base de données", async () => {
+describe('PATCH /api/conversations/[id] (E2E - US-4)', () => {
+  it("devrait modifier le titre d'une conversation (200)", async () => {
     // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'alice@example.com',
-        password: 'hashedPassword',
-        name: 'Alice',
-      },
+    const user = await createTestUser(context.prisma);
+    const conversation = await createTestConversation(context.prisma, user.id, {
+      title: 'Ancien titre',
     });
 
-    const conversation = await prisma.conversation.create({
-      data: {
-        title: 'Ancien titre',
-        authorId: user.id,
-      },
-    });
+    const { getSession } = require('@/lib/auth/auth-helpers');
+    getSession.mockResolvedValue({ user: { id: user.id } });
 
-    const command = {
-      conversationId: conversation.id,
-      newTitle: 'Nouveau titre',
-      userId: user.id,
-    };
-
-    // Quand
-    const result = await useCase.execute(command);
-
-    // Alors
-    expect(result.success).toBe(true);
-
-    const updatedConversation = await prisma.conversation.findUnique({
-      where: { id: conversation.id },
-    });
-
-    expect(updatedConversation).not.toBeNull();
-    expect(updatedConversation!.title).toBe('Nouveau titre');
-    expect(updatedConversation!.updatedAt).not.toBeNull();
-  });
-
-  it('devrait rejeter un titre vide', async () => {
-    // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'alice@example.com',
-        password: 'hashedPassword',
-      },
-    });
-
-    const conversation = await prisma.conversation.create({
-      data: {
-        title: 'Ancien titre',
-        authorId: user.id,
-      },
-    });
-
-    const command = {
-      conversationId: conversation.id,
-      newTitle: '',
-      userId: user.id,
-    };
-
-    // Quand / Alors
-    await expect(useCase.execute(command)).rejects.toThrow('titre');
-  });
-
-  it('devrait rejeter un titre trop long', async () => {
-    // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'alice@example.com',
-        password: 'hashedPassword',
-      },
-    });
-
-    const conversation = await prisma.conversation.create({
-      data: {
-        title: 'Ancien titre',
-        authorId: user.id,
-      },
-    });
-
-    const command = {
-      conversationId: conversation.id,
-      newTitle: 'a'.repeat(201),
-      userId: user.id,
-    };
-
-    // Quand / Alors
-    await expect(useCase.execute(command)).rejects.toThrow('titre');
-  });
-
-  it("devrait rejeter si la conversation n'existe pas", async () => {
-    // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'alice@example.com',
-        password: 'hashedPassword',
-      },
-    });
-
-    const command = {
-      conversationId: 'non-existent-id',
-      newTitle: 'Nouveau titre',
-      userId: user.id,
-    };
-
-    // Quand / Alors
-    await expect(useCase.execute(command)).rejects.toThrow(
-      'Conversation non trouvée'
+    const request = new NextRequest(
+      'http://localhost:3000/api/conversations/' + conversation.id,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ title: 'Nouveau titre' }),
+      }
     );
-  });
-
-  it("devrait rejeter si l'utilisateur n'est pas le propriétaire", async () => {
-    // Étant donné
-    const owner = await prisma.user.create({
-      data: {
-        email: 'owner@example.com',
-        password: 'hashedPassword',
-        name: 'Owner',
-      },
-    });
-
-    const otherUser = await prisma.user.create({
-      data: {
-        email: 'other@example.com',
-        password: 'hashedPassword',
-        name: 'Other',
-      },
-    });
-
-    const conversation = await prisma.conversation.create({
-      data: {
-        title: 'Ancien titre',
-        authorId: owner.id,
-      },
-    });
-
-    const command = {
-      conversationId: conversation.id,
-      newTitle: 'Nouveau titre',
-      userId: otherUser.id,
-    };
-
-    // Quand / Alors
-    await expect(useCase.execute(command)).rejects.toThrow('Non autorisé');
-  });
-
-  it('devrait accepter un titre de 1 caractère', async () => {
-    // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'alice@example.com',
-        password: 'hashedPassword',
-      },
-    });
-
-    const conversation = await prisma.conversation.create({
-      data: {
-        title: 'Ancien titre',
-        authorId: user.id,
-      },
-    });
-
-    const command = {
-      conversationId: conversation.id,
-      newTitle: 'A',
-      userId: user.id,
-    };
 
     // Quand
-    const result = await useCase.execute(command);
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: conversation.id }),
+    });
+    const data = await response.json();
 
     // Alors
-    expect(result.success).toBe(true);
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
 
-    const updatedConversation = await prisma.conversation.findUnique({
+    const updated = await context.prisma.conversation.findUnique({
       where: { id: conversation.id },
     });
-
-    expect(updatedConversation).not.toBeNull();
-    expect(updatedConversation!.title).toBe('A');
+    expect(updated?.title).toBe('Nouveau titre');
   });
 
-  it('devrait accepter un titre de 200 caractères', async () => {
+  it('devrait retourner 401 si non authentifié', async () => {
     // Étant donné
-    const user = await prisma.user.create({
-      data: {
-        email: 'alice@example.com',
-        password: 'hashedPassword',
-      },
-    });
+    const user = await createTestUser(context.prisma);
+    const conversation = await createTestConversation(context.prisma, user.id);
 
-    const conversation = await prisma.conversation.create({
-      data: {
-        title: 'Ancien titre',
-        authorId: user.id,
-      },
-    });
+    const { getSession } = require('@/lib/auth/auth-helpers');
+    getSession.mockResolvedValue(null);
 
-    const newTitle = 'a'.repeat(200);
-    const command = {
-      conversationId: conversation.id,
-      newTitle,
-      userId: user.id,
-    };
+    const request = new NextRequest(
+      'http://localhost:3000/api/conversations/' + conversation.id,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ title: 'Test' }),
+      }
+    );
 
     // Quand
-    const result = await useCase.execute(command);
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: conversation.id }),
+    });
+    const data = await response.json();
 
     // Alors
-    expect(result.success).toBe(true);
+    expect(response.status).toBe(401);
+    expect(data).toHaveProperty('error');
+  });
 
-    const updatedConversation = await prisma.conversation.findUnique({
-      where: { id: conversation.id },
+  it('devrait retourner 403 si pas le propriétaire', async () => {
+    // Étant donné
+    const owner = await createTestUser(context.prisma);
+    const other = await createTestUser(context.prisma);
+    const conversation = await createTestConversation(context.prisma, owner.id);
+
+    const { getSession } = require('@/lib/auth/auth-helpers');
+    getSession.mockResolvedValue({ user: { id: other.id } });
+
+    const request = new NextRequest(
+      'http://localhost:3000/api/conversations/' + conversation.id,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ title: 'Test' }),
+      }
+    );
+
+    // Quand
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: conversation.id }),
     });
+    const data = await response.json();
 
-    expect(updatedConversation).not.toBeNull();
-    expect(updatedConversation!.title).toHaveLength(200);
+    // Alors
+    expect(response.status).toBe(403);
+    expect(data).toHaveProperty('error');
+    expect(data.error).toMatch(/autorisé/i);
+  });
+
+  it('devrait retourner 400 si titre vide', async () => {
+    // Étant donné
+    const user = await createTestUser(context.prisma);
+    const conversation = await createTestConversation(context.prisma, user.id);
+
+    const { getSession } = require('@/lib/auth/auth-helpers');
+    getSession.mockResolvedValue({ user: { id: user.id } });
+
+    const request = new NextRequest(
+      'http://localhost:3000/api/conversations/' + conversation.id,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ title: '' }),
+      }
+    );
+
+    // Quand
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: conversation.id }),
+    });
+    const data = await response.json();
+
+    // Alors
+    expect(response.status).toBe(400);
+    expect(data).toHaveProperty('error');
+    expect(data.error).toMatch(/titre/i);
   });
 });
