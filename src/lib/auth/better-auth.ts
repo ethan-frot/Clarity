@@ -2,7 +2,7 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { Resend } from 'resend';
 import { render } from '@react-email/components';
-import PasswordResetEmail from '@/module/user/requestPasswordReset/ui/PasswordResetEmail';
+import PasswordResetEmail from '@/../emails/PasswordResetEmail';
 import { prisma } from '../prisma';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
