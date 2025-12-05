@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
+import { signUp } from '@/lib/auth/auth-client';
 import { toast } from 'sonner';
 import {
   EmailInput,
@@ -48,27 +49,19 @@ export function SignUpForm() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+      const result = await signUp.email({
+        email: data.email,
+        password: data.password,
+        name: data.name || '',
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        // Erreur serveur (400, 409, 500)
-        toast.error(result.error || 'Une erreur est survenue');
+      if (result.error) {
+        toast.error(result.error.message || 'Une erreur est survenue');
         return;
       }
 
-      // Succès
       toast.success('Compte créé avec succès');
 
-      // Redirection différée pour laisser le temps à l'utilisateur de lire le toast
-      // UX : 1.5s est suffisant pour confirmer l'action sans ralentir le flow
       setTimeout(() => {
         router.push('/signin');
       }, 1500);
