@@ -638,6 +638,24 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
   - **Quand** on demande les contributions de "user-999"
   - **Alors** une erreur **404 Not Found** doit être retournée
 
+- **Exemple 3 / Scénario 3 : Utilisateur sans contributions**
+  - **Étant donné** qu'un utilisateur "user-456" existe
+  - **Et** qu'il n'a créé aucune conversation
+  - **Et** qu'il n'a posté aucun message
+  - **Quand** on demande les contributions de "user-456"
+  - **Alors** les informations publiques de l'utilisateur doivent être retournées
+  - **Et** le tableau des conversations doit être vide
+  - **Et** le tableau des messages doit être vide
+
+- **Exemple 4 / Scénario 4 : Exclusion des éléments supprimés**
+  - **Étant donné** qu'un utilisateur "user-789" existe
+  - **Et** qu'il a créé 2 conversations (1 active, 1 supprimée)
+  - **Et** qu'il a posté 3 messages (2 actifs, 1 supprimé)
+  - **Quand** on demande les contributions de "user-789"
+  - **Alors** seule la conversation active doit être retournée
+  - **Et** seuls les 2 messages actifs doivent être retournés
+  - **Et** les éléments avec `deletedAt` non-null ne doivent pas apparaître
+
 ---
 
 ## 📝 Notes et conventions
