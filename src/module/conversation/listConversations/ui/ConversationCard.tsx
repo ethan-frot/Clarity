@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { MessageSquare, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { getRelativeTime } from '@/lib/date';
+import { UserLink } from '@/components/app/common/UserLink';
 
 interface AuthorInfo {
   id: string;
@@ -30,8 +31,6 @@ interface ConversationCardProps {
 }
 
 export function ConversationCard({ conversation }: ConversationCardProps) {
-  const authorDisplayName =
-    conversation.author.name || conversation.author.email;
   const createdDate = conversation.createdAt
     ? new Date(conversation.createdAt)
     : null;
@@ -41,13 +40,12 @@ export function ConversationCard({ conversation }: ConversationCardProps) {
       <Card className="w-full bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 hover:scale-[1.01] hover:shadow-lg transition-all duration-300 cursor-pointer gap-0">
         <CardHeader className="pb-0">
           <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="h-10 w-10 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold shrink-0">
-                {authorDisplayName.charAt(0).toUpperCase()}
-              </div>
-              <p className="text-sm font-medium text-white/90 truncate">
-                {authorDisplayName}
-              </p>
+            <div className="flex-1 min-w-0">
+              <UserLink
+                userId={conversation.author.id}
+                userName={conversation.author.name}
+                userEmail={conversation.author.email}
+              />
             </div>
             {createdDate && (
               <div className="flex items-center gap-1.5 text-xs text-white/50 shrink-0">

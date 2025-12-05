@@ -11,6 +11,7 @@ import { DeleteConversationDialog } from '@/module/conversation/deleteConversati
 import { CreateMessageForm } from '@/module/message/createMessage/ui/CreateMessageForm';
 import { fetchConversationById } from '@/services/conversation.service';
 import { getRelativeTime } from '@/lib/date';
+import { UserLink } from '@/components/app/common/UserLink';
 
 interface ConversationDetailProps {
   conversationId: string;
@@ -68,8 +69,6 @@ export function ConversationDetail({
     return null;
   }
 
-  const authorDisplayName =
-    conversation.author.name || conversation.author.email;
   const createdDate = new Date(conversation.createdAt);
 
   return (
@@ -98,13 +97,15 @@ export function ConversationDetail({
           )}
 
           <div className="flex items-start gap-4 mb-4">
-            <div className="h-12 w-12 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold shrink-0">
-              {authorDisplayName.charAt(0).toUpperCase()}
-            </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white/90 mb-1">
-                {authorDisplayName}
-              </p>
+              <div className="mb-2">
+                <UserLink
+                  userId={conversation.author.id}
+                  userName={conversation.author.name}
+                  userEmail={conversation.author.email}
+                  size="lg"
+                />
+              </div>
               <div className="flex items-center gap-1.5 text-xs text-white/50">
                 <Clock className="h-3 w-3" />
                 <span>{getRelativeTime(createdDate)}</span>
