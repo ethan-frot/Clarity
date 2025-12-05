@@ -1,12 +1,8 @@
-/**
- * Repository Prisma : Suppression de conversation (US-5)
- *
- * Implémente le soft delete en définissant deletedAt
- */
 import { prisma } from '@/lib/prisma';
 import { DeleteConversationRepository } from './DeleteConversationRepository';
 import { Conversation } from '@/domain/conversation/Conversation';
 import { PrismaClient } from '@/generated/prisma';
+import { toConversationDomain } from '../shared/conversationMapper';
 
 export class DeleteConversationPrismaRepository implements DeleteConversationRepository {
   private prismaClient: PrismaClient;
@@ -24,14 +20,7 @@ export class DeleteConversationPrismaRepository implements DeleteConversationRep
       return null;
     }
 
-    return new Conversation({
-      id: data.id,
-      title: data.title,
-      authorId: data.authorId,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt || data.createdAt,
-      deletedAt: data.deletedAt,
-    });
+    return toConversationDomain(data);
   }
 
   async delete(id: string): Promise<void> {
