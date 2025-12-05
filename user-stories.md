@@ -198,6 +198,7 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
 - L'utilisateur **doit être authentifié**
 - L'utilisateur **doit être le propriétaire** (`authorId` = user session ID)
 - Suppression **soft delete** : définir `deletedAt` à la date actuelle
+- **Tous les messages** de la conversation doivent également être supprimés (`deletedAt` défini)
 - La conversation n'est **pas physiquement supprimée** de la base
 - Retourne **401 Unauthorized** si non authentifié
 - Retourne **403 Forbidden** si l'utilisateur n'est pas le propriétaire
@@ -222,6 +223,15 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
   - **Étant donné** qu'aucun utilisateur n'est authentifié
   - **Quand** on tente de supprimer une conversation
   - **Alors** une erreur **401 Unauthorized** doit être retournée
+
+- **Exemple 4 / Scénario 4 : Suppression des messages associés**
+  - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-123"
+  - **Et** qu'une conversation existe avec l'ID "conv-123" et `authorId` = "user-123"
+  - **Et** que cette conversation contient 5 messages
+  - **Quand** il supprime la conversation
+  - **Alors** `deletedAt` doit être défini pour la conversation
+  - **Et** `deletedAt` doit être défini pour tous les 5 messages de la conversation
+  - **Et** les messages ne doivent plus apparaître dans les contributions de l'utilisateur
 
 ---
 

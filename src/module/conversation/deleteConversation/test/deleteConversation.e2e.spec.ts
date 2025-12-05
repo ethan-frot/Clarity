@@ -58,6 +58,59 @@ describe('DELETE /api/conversations/[id] (E2E - US-5)', () => {
     expect(deleted?.deletedAt).not.toBeNull();
   });
 
+  it('devrait supprimer tous les messages de la conversation (200)', async () => {
+    // Étant donné
+    const user = await createTestUser(context.prisma);
+    const conversation = await createTestConversation(context.prisma, user.id);
+
+    await context.prisma.message.createMany({
+      data: [
+        {
+          content: 'Message 1',
+          authorId: user.id,
+          conversationId: conversation.id,
+        },
+        {
+          content: 'Message 2',
+          authorId: user.id,
+          conversationId: conversation.id,
+        },
+        {
+          content: 'Message 3',
+          authorId: user.id,
+          conversationId: conversation.id,
+        },
+      ],
+    });
+
+    const { getSession } = require('@/lib/auth/auth-helpers');
+    getSession.mockResolvedValue({ user: { id: user.id } });
+
+    const request = new NextRequest(
+      'http://localhost:3000/api/conversations/' + conversation.id,
+      {
+        method: 'DELETE',
+      }
+    );
+
+    // Quand
+    const response = await DELETE(request, {
+      params: Promise.resolve({ id: conversation.id }),
+    });
+
+    // Alors
+    expect(response.status).toBe(200);
+
+    const messages = await context.prisma.message.findMany({
+      where: { conversationId: conversation.id },
+    });
+
+    expect(messages).toHaveLength(4);
+    messages.forEach((message) => {
+      expect(message.deletedAt).not.toBeNull();
+    });
+  });
+
   it('devrait retourner 401 si non authentifié', async () => {
     // Étant donné
     const user = await createTestUser(context.prisma);

@@ -35,11 +35,17 @@ export class DeleteConversationPrismaRepository implements DeleteConversationRep
   }
 
   async delete(id: string): Promise<void> {
-    await this.prismaClient.conversation.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
+    const now = new Date();
+
+    await this.prismaClient.$transaction([
+      this.prismaClient.message.updateMany({
+        where: { conversationId: id },
+        data: { deletedAt: now },
+      }),
+      this.prismaClient.conversation.update({
+        where: { id },
+        data: { deletedAt: now },
+      }),
+    ]);
   }
 }
