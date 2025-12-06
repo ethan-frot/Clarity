@@ -2,23 +2,19 @@ import { prisma } from '@/lib/prisma';
 import { UpdateMessageRepository } from './UpdateMessageRepository';
 import { Message } from '@/domain/message/Message';
 import { PrismaClient } from '@/generated/prisma';
-import { toMessageDomain } from '../shared/messageMapper';
+import { MessageReader } from '../shared/MessageReader';
 
 export class UpdateMessagePrismaRepository implements UpdateMessageRepository {
   private prismaClient: PrismaClient;
+  private reader: MessageReader;
 
   constructor(prismaClient?: PrismaClient) {
     this.prismaClient = prismaClient || prisma;
+    this.reader = new MessageReader(this.prismaClient);
   }
 
   async findById(id: string): Promise<Message | null> {
-    const data = await this.prismaClient.message.findUnique({
-      where: { id, deletedAt: null },
-    });
-
-    if (!data) return null;
-
-    return toMessageDomain(data);
+    return this.reader.findById(id);
   }
 
   async update(message: Message): Promise<void> {
