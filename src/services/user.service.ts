@@ -12,3 +12,21 @@ export async function fetchUserContributions(
 
   return response.json();
 }
+
+export async function updateProfile(data: {
+  name?: string | null;
+  bio?: string | null;
+}): Promise<void> {
+  const response = await fetch('/api/users/profile', {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Erreur lors de la mise à jour');
+  }
+}
