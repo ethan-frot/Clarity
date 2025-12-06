@@ -36,46 +36,49 @@ export function ConversationCard({ conversation }: ConversationCardProps) {
     : null;
 
   return (
-    <Link href={`/conversations/${conversation.id}`} className="block w-full">
-      <Card className="w-full bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 hover:scale-[1.01] hover:shadow-lg transition-all duration-300 cursor-pointer gap-0">
-        <CardHeader className="pb-0">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <UserLink
-                userId={conversation.author.id}
-                userName={conversation.author.name}
-                userEmail={conversation.author.email}
-              />
+    <Card className="w-full bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 hover:scale-[1.01] hover:shadow-lg transition-all duration-300 gap-0 relative">
+      <CardHeader className="pb-0">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0 relative z-10">
+            <UserLink
+              userId={conversation.author.id}
+              userName={conversation.author.name}
+              userEmail={conversation.author.email}
+            />
+          </div>
+          {createdDate && (
+            <div className="flex items-center gap-1.5 text-xs text-white/50 shrink-0">
+              <Clock className="h-3 w-3" />
+              <span>{getRelativeTime(createdDate)}</span>
             </div>
-            {createdDate && (
-              <div className="flex items-center gap-1.5 text-xs text-white/50 shrink-0">
-                <Clock className="h-3 w-3" />
-                <span>{getRelativeTime(createdDate)}</span>
-              </div>
-            )}
-          </div>
-          <h3 className="text-lg font-semibold text-white wrap-break-word mt-3">
-            {conversation.title}
-          </h3>
-        </CardHeader>
-        <CardContent className="pt-0">
-          {conversation.lastMessage && (
-            <p className="text-sm text-white/60 mb-3 wrap-break-word">
-              {conversation.lastMessage.content}
-            </p>
           )}
-          <div className="flex items-center gap-2 text-sm text-white/50">
-            <MessageSquare className="h-4 w-4" />
-            <span>
-              {conversation.messageCount === 0
-                ? 'Aucune réponse'
-                : `${conversation.messageCount} réponse${
-                    conversation.messageCount > 1 ? 's' : ''
-                  }`}
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-    </Link>
+        </div>
+        <h3 className="text-lg font-semibold text-white wrap-break-word mt-3">
+          <Link
+            href={`/conversations/${conversation.id}`}
+            className="after:absolute after:inset-0 after:z-0"
+          >
+            {conversation.title}
+          </Link>
+        </h3>
+      </CardHeader>
+      <CardContent className="pt-0">
+        {conversation.lastMessage && (
+          <p className="text-sm text-white/60 mb-3 wrap-break-word">
+            {conversation.lastMessage.content}
+          </p>
+        )}
+        <div className="flex items-center gap-2 text-sm text-white/50">
+          <MessageSquare className="h-4 w-4" />
+          <span>
+            {conversation.messageCount === 0
+              ? 'Aucune réponse'
+              : `${conversation.messageCount} réponse${
+                  conversation.messageCount > 1 ? 's' : ''
+                }`}
+          </span>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

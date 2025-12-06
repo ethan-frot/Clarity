@@ -30,7 +30,6 @@ export function UserLink({
     <Link
       href={`/users/${userId}/contributions`}
       className="inline-flex items-center gap-3 group hover:opacity-80 transition-opacity"
-      onClick={(e) => e.stopPropagation()}
     >
       <div
         className={`${sizeClasses[size]} rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold shrink-0 group-hover:scale-110 transition-transform duration-200`}
