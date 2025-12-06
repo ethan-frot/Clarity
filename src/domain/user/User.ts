@@ -23,6 +23,7 @@ export class User {
     updatedAt?: Date;
   }) {
     this.validateName(props.name);
+    this.validateBio(props.bio);
 
     this.id = props.id;
     this.email = props.email;
@@ -36,6 +37,12 @@ export class User {
   private validateName(name?: string): void {
     if (name && name.length > 100) {
       throw new Error('Le nom ne peut pas dépasser 100 caractères');
+    }
+  }
+
+  private validateBio(bio?: string): void {
+    if (bio && bio.length > 500) {
+      throw new Error('La bio ne peut pas dépasser 500 caractères');
     }
   }
 }
