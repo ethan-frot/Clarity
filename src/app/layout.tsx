@@ -4,7 +4,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 import { BackgroundLayout } from '@/components/app/common/BackgroundLayout';
 import { QueryClientProvider } from '@/components/providers/QueryClientProvider';
-import { AuthButton } from '@/components/app/common/AuthButton';
+import { UserDropdown } from '@/components/app/common/UserDropdown';
 
 const satoshi = localFont({
   src: [
@@ -38,7 +38,7 @@ export default function RootLayout({
         <QueryClientProvider>
           <BackgroundLayout>
             <div className="fixed top-6 right-6 z-50">
-              <AuthButton />
+              <UserDropdown />
             </div>
             {children}
           </BackgroundLayout>
