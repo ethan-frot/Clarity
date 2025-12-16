@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSession, signOut } from '@/lib/auth/auth-client';
 import { useRouter } from 'next/navigation';
-import { User, Settings, LogOut } from 'lucide-react';
+import { User, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { GradientButton } from './GradientButton';
 import { toast } from 'sonner';
 
@@ -65,41 +65,23 @@ export function UserDropdown() {
     );
   }
 
-  const userName =
-    session.user?.name || session.user?.email?.split('@')[0] || 'Utilisateur';
-  const userInitials = userName
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg hover:bg-white/10 transition-all duration-300 cursor-pointer"
+        className="flex items-center gap-2 px-3 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg hover:bg-white/10 transition-all duration-300 cursor-pointer"
         aria-label="Menu utilisateur"
       >
-        <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-lg">
-          {userInitials}
-        </div>
-        <span className="text-white font-medium hidden sm:block">
-          {userName}
-        </span>
+        <User className="w-5 h-5 text-white" />
+        <ChevronDown
+          className={`w-4 h-4 text-white/70 transition-transform duration-200 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+        />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg p-2 min-w-60 z-50 shadow-lg shadow-black/20">
-          <div className="px-3 py-2 mb-2 border-b border-white/10">
-            <p className="text-sm font-medium text-white truncate">
-              {userName}
-            </p>
-            <p className="text-xs text-white/60 truncate">
-              {session.user?.email}
-            </p>
-          </div>
-
+        <div className="absolute right-0 mt-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-lg p-2 min-w-[200px] z-50 shadow-lg shadow-black/20">
           <button
             onClick={() => {
               router.push(`/users/${session.user?.id}/contributions`);
@@ -108,7 +90,7 @@ export function UserDropdown() {
             className="w-full flex items-center gap-3 px-3 py-2 text-white/90 rounded-md transition-all duration-300 hover:bg-white/10 hover:text-white cursor-pointer"
           >
             <User className="h-4 w-4 shrink-0" />
-            <span>Mes contributions</span>
+            <span className="whitespace-nowrap">Mes contributions</span>
           </button>
 
           <button
@@ -119,7 +101,7 @@ export function UserDropdown() {
             className="w-full flex items-center gap-3 px-3 py-2 text-white/90 rounded-md transition-all duration-300 hover:bg-white/10 hover:text-white cursor-pointer"
           >
             <Settings className="h-4 w-4 shrink-0" />
-            <span>Paramètres</span>
+            <span className="whitespace-nowrap">Paramètres</span>
           </button>
 
           <div className="border-t border-white/10 my-2" />
@@ -132,7 +114,7 @@ export function UserDropdown() {
             className="w-full flex items-center gap-3 px-3 py-2 text-red-400 rounded-md transition-all duration-300 hover:bg-red-500/10 hover:text-red-300 cursor-pointer"
           >
             <LogOut className="h-4 w-4 shrink-0" />
-            <span>Déconnexion</span>
+            <span className="whitespace-nowrap">Déconnexion</span>
           </button>
         </div>
       )}
