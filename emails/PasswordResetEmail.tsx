@@ -16,11 +16,13 @@ interface PasswordResetEmailProps {
 }
 
 export default function PasswordResetEmail({
-  resetUrl = 'http://localhost:3000/reset-password?token=preview-token-123',
+  resetUrl = 'https://forum-nextjs.ethanfrot.com/reset-password?token=preview-token-123',
   userName,
 }: PasswordResetEmailProps) {
   // Extraire l'URL de base pour le lien du titre (avec fallback pour preview)
-  const baseUrl = resetUrl ? new URL(resetUrl).origin : 'http://localhost:3000';
+  const baseUrl = resetUrl
+    ? new URL(resetUrl).origin
+    : 'https://forum-nextjs.ethanfrot.com';
 
   return (
     <Html>
