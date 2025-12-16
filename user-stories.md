@@ -668,6 +668,53 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
 
 ---
 
+### US-16: Récupérer mon profil utilisateur
+
+**En tant qu'utilisateur authentifié,**
+**Je veux récupérer mes informations de profil,**
+**Afin de les afficher ou de pré-remplir un formulaire de modification**
+
+**Règles métier :**
+
+- L'utilisateur **doit être authentifié**
+- Retourne les informations du profil de l'utilisateur connecté : `id`, `email`, `name`, `bio`, `avatar`
+- **Ne jamais exposer** : `password`, `createdAt`, `updatedAt`
+- Les champs `name`, `bio` et `avatar` **peuvent être `null`** s'ils n'ont pas été renseignés
+- Retourne **401 Unauthorized** si non authentifié
+
+**Exemples / Scénarios :**
+
+- **Exemple 1 / Scénario 1 : Récupération réussie avec informations complètes**
+  - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-123"
+  - **Et** que son profil contient : name = "John Doe", bio = "Software Developer", avatar = "https://cdn.example.com/avatar.jpg"
+  - **Quand** il récupère son profil
+  - **Alors** les informations suivantes doivent être retournées :
+    - `id` : "user-123"
+    - `email` : "john@example.com"
+    - `name` : "John Doe"
+    - `bio` : "Software Developer"
+    - `avatar` : "https://cdn.example.com/avatar.jpg"
+  - **Et** le statut HTTP doit être **200 OK**
+
+- **Exemple 2 / Scénario 2 : Récupération réussie avec informations minimales**
+  - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-456"
+  - **Et** que son profil contient : name = `null`, bio = `null`, avatar = `null`
+  - **Quand** il récupère son profil
+  - **Alors** les informations suivantes doivent être retournées :
+    - `id` : "user-456"
+    - `email` : "jane@example.com"
+    - `name` : `null`
+    - `bio` : `null`
+    - `avatar` : `null`
+  - **Et** le statut HTTP doit être **200 OK**
+
+- **Exemple 3 / Scénario 3 : Récupération échouée - non authentifié**
+  - **Étant donné** qu'aucun utilisateur n'est authentifié
+  - **Quand** on tente de récupérer le profil
+  - **Alors** une erreur **401 Unauthorized** doit être retournée
+
+---
+
 ### US-15a: Modifier nom et bio du profil
 
 **En tant qu'utilisateur authentifié,**
@@ -678,7 +725,6 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
 
 - L'utilisateur **doit être authentifié**
 - L'utilisateur **ne peut modifier que son propre profil**
-- L'utilisateur **doit pouvoir récupérer son profil actuel** (name, bio) pour pré-remplir le formulaire
 - **Nom (name)** :
   - Optionnel (peut être `null`)
   - Maximum 100 caractères si fourni
@@ -691,56 +737,44 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
 
 **Exemples / Scénarios :**
 
-- **Exemple 1 / Scénario 1 : Récupération du profil actuel réussie**
-  - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-123"
-  - **Et** que son profil contient `name` = "Alice Dupont" et `bio` = "Développeuse web"
-  - **Quand** il demande son profil actuel
-  - **Alors** les données `name` et `bio` doivent être retournées
-  - **Et** le statut HTTP doit être **200 OK**
-
-- **Exemple 2 / Scénario 2 : Récupération échouée - non authentifié**
-  - **Étant donné** qu'aucun utilisateur n'est authentifié
-  - **Quand** on tente de récupérer le profil actuel
-  - **Alors** une erreur **401 Unauthorized** doit être retournée
-
-- **Exemple 3 / Scénario 3 : Modification du nom réussie**
+- **Exemple 1 / Scénario 1 : Modification du nom réussie**
   - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-123"
   - **Quand** il modifie son nom en "Alice Dupont"
   - **Alors** le champ `name` doit être mis à jour
   - **Et** `updatedAt` doit être mis à jour
   - **Et** le statut HTTP doit être **200 OK**
 
-- **Exemple 4 / Scénario 4 : Modification de la bio réussie**
+- **Exemple 2 / Scénario 2 : Modification de la bio réussie**
   - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-123"
   - **Quand** il modifie sa bio en "Développeur passionné par Next.js"
   - **Alors** le champ `bio` doit être mis à jour
   - **Et** `updatedAt` doit être mis à jour
   - **Et** le statut HTTP doit être **200 OK**
 
-- **Exemple 5 / Scénario 5 : Modification du nom et bio réussie**
+- **Exemple 3 / Scénario 3 : Modification du nom et bio réussie**
   - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-123"
   - **Quand** il modifie son nom en "Alice Dupont" et sa bio en "Développeuse web"
   - **Alors** les champs `name` et `bio` doivent être mis à jour
   - **Et** `updatedAt` doit être mis à jour
   - **Et** le statut HTTP doit être **200 OK**
 
-- **Exemple 6 / Scénario 6 : Suppression du nom (null)**
+- **Exemple 4 / Scénario 4 : Suppression du nom (null)**
   - **Étant donné** qu'un utilisateur est authentifié avec un nom défini
   - **Quand** il modifie son nom avec une valeur `null`
   - **Alors** le champ `name` doit être `null`
   - **Et** le statut HTTP doit être **200 OK**
 
-- **Exemple 7 / Scénario 7 : Modification échouée - nom trop long**
+- **Exemple 5 / Scénario 5 : Modification échouée - nom trop long**
   - **Étant donné** qu'un utilisateur est authentifié
   - **Quand** il tente de modifier son nom avec 101 caractères
   - **Alors** une erreur **400 Bad Request** doit être retournée
 
-- **Exemple 8 / Scénario 8 : Modification échouée - bio trop longue**
+- **Exemple 6 / Scénario 6 : Modification échouée - bio trop longue**
   - **Étant donné** qu'un utilisateur est authentifié
   - **Quand** il tente de modifier sa bio avec 501 caractères
   - **Alors** une erreur **400 Bad Request** doit être retournée
 
-- **Exemple 9 / Scénario 9 : Modification échouée - non authentifié**
+- **Exemple 7 / Scénario 7 : Modification échouée - non authentifié**
   - **Étant donné** qu'aucun utilisateur n'est authentifié
   - **Quand** on tente de modifier un profil
   - **Alors** une erreur **401 Unauthorized** doit être retournée
@@ -757,7 +791,6 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
 
 - L'utilisateur **doit être authentifié**
 - L'utilisateur **ne peut modifier que son propre profil**
-- L'utilisateur **doit pouvoir récupérer son avatar actuel** (URL) pour l'afficher dans le formulaire
 - **Avatar** :
   - Optionnel (peut être `null`)
   - **Upload de fichier image** (JPEG, PNG, WebP uniquement)
@@ -772,26 +805,7 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
 
 **Exemples / Scénarios :**
 
-- **Exemple 1 / Scénario 1 : Récupération de l'avatar actuel réussie**
-  - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-123"
-  - **Et** que cet utilisateur a un avatar défini avec l'URL "https://cdn.example.com/avatars/user-123/avatar.jpg"
-  - **Quand** il demande son avatar actuel
-  - **Alors** l'URL de l'avatar doit être retournée
-  - **Et** le statut HTTP doit être **200 OK**
-
-- **Exemple 2 / Scénario 2 : Récupération de l'avatar actuel - aucun avatar défini**
-  - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-123"
-  - **Et** que cet utilisateur n'a pas d'avatar (avatar = `null`)
-  - **Quand** il demande son avatar actuel
-  - **Alors** la valeur `null` doit être retournée
-  - **Et** le statut HTTP doit être **200 OK**
-
-- **Exemple 3 / Scénario 3 : Récupération échouée - non authentifié**
-  - **Étant donné** qu'aucun utilisateur n'est authentifié
-  - **Quand** on tente de récupérer l'avatar actuel
-  - **Alors** une erreur **401 Unauthorized** doit être retournée
-
-- **Exemple 4 / Scénario 4 : Upload d'avatar réussi**
+- **Exemple 1 / Scénario 1 : Upload d'avatar réussi**
   - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-123"
   - **Quand** il upload une image JPEG valide de 1 MB
   - **Alors** le fichier doit être uploadé sur le CDN
@@ -800,32 +814,32 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
   - **Et** `updatedAt` doit être mis à jour
   - **Et** le statut HTTP doit être **200 OK**
 
-- **Exemple 5 / Scénario 5 : Upload d'avatar PNG réussi**
+- **Exemple 2 / Scénario 2 : Upload d'avatar PNG réussi**
   - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-123"
   - **Quand** il upload une image PNG valide de 500 KB
   - **Alors** le fichier doit être uploadé sur le CDN
   - **Et** le champ `avatar` doit être mis à jour avec l'URL CDN
   - **Et** le statut HTTP doit être **200 OK**
 
-- **Exemple 6 / Scénario 6 : Suppression de l'avatar (null)**
+- **Exemple 3 / Scénario 3 : Suppression de l'avatar (null)**
   - **Étant donné** qu'un utilisateur est authentifié avec un avatar défini
   - **Quand** il supprime son avatar (valeur `null`)
   - **Alors** le champ `avatar` doit être `null`
   - **Et** le statut HTTP doit être **200 OK**
 
-- **Exemple 7 / Scénario 7 : Upload échoué - fichier trop volumineux**
+- **Exemple 4 / Scénario 4 : Upload échoué - fichier trop volumineux**
   - **Étant donné** qu'un utilisateur est authentifié
   - **Quand** il tente d'uploader une image de 3 MB (> 2 MB max)
   - **Alors** une erreur **400 Bad Request** doit être retournée
   - **Et** le message d'erreur doit indiquer "L'image ne peut pas dépasser 2 MB"
 
-- **Exemple 8 / Scénario 8 : Upload échoué - format non supporté**
+- **Exemple 5 / Scénario 5 : Upload échoué - format non supporté**
   - **Étant donné** qu'un utilisateur est authentifié
   - **Quand** il tente d'uploader un fichier GIF ou PDF
   - **Alors** une erreur **400 Bad Request** doit être retournée
   - **Et** le message d'erreur doit indiquer "Format non supporté (JPEG, PNG, WebP uniquement)"
 
-- **Exemple 9 / Scénario 9 : Upload échoué - non authentifié**
+- **Exemple 6 / Scénario 6 : Upload échoué - non authentifié**
   - **Étant donné** qu'aucun utilisateur n'est authentifié
   - **Quand** on tente d'uploader un avatar
   - **Alors** une erreur **401 Unauthorized** doit être retournée
@@ -938,7 +952,7 @@ Chaque User Story doit avoir :
 - ✅ **Tests unitaires** pour la logique métier (entités + use cases)
 - ✅ **Tests E2E** pour les API routes (avec PostgreSQL en testcontainer)
 
-### Ordre d'implémentation recommandé
+### Ordre d'implémentation effectif
 
 1. **US-9** : Inscription (Sign Up)
 2. **US-10** : Connexion (Sign In)
@@ -955,5 +969,6 @@ Chaque User Story doit avoir :
 13. **US-13** : Réinitialiser mot de passe
 14. **US-14** : Consulter les contributions
 15. **US-15a** : Modifier nom et bio du profil
-16. **US-15b** : Upload avatar utilisateur
-17. **US-15c** : Changer mot de passe
+16. **US-16** : Récupérer mon profil utilisateur
+17. **US-15b** : Upload avatar utilisateur
+18. **US-15c** : Changer mot de passe
