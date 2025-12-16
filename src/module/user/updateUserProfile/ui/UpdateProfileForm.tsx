@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { User, FileText } from 'lucide-react';
@@ -9,6 +9,7 @@ import { IconInput } from '@/components/app/common/IconInput';
 import { IconTextarea } from '@/components/app/common/IconTextarea';
 import { useUserProfile } from '@/module/user/hooks/useUserProfile';
 import { useUpdateProfile } from '@/module/user/hooks/useUpdateProfile';
+import { AvatarUpload } from './AvatarUpload';
 
 interface UpdateProfileFormData {
   name: string;
@@ -18,6 +19,7 @@ interface UpdateProfileFormData {
 export function UpdateProfileForm() {
   const { data: profile, isLoading: isFetchingProfile } = useUserProfile();
   const updateProfileMutation = useUpdateProfile();
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const {
     register,
@@ -39,6 +41,32 @@ export function UpdateProfileForm() {
       });
     }
   }, [profile, reset]);
+
+  const handleUploadAvatar = async (file: File) => {
+    setIsUploadingAvatar(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      toast.success(`Avatar uploadé : ${file.name} (mock)`);
+    } catch (error) {
+      toast.error("Erreur lors de l'upload de l'avatar");
+      console.error(error);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    setIsUploadingAvatar(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      toast.success('Avatar supprimé (mock)');
+    } catch (error) {
+      toast.error("Erreur lors de la suppression de l'avatar");
+      console.error(error);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
 
   const onSubmit = async (data: UpdateProfileFormData) => {
     try {
@@ -71,7 +99,7 @@ export function UpdateProfileForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto space-y-6">
       <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
         <div className="space-y-3 mb-6">
           <h2 className="text-2xl font-bold text-white flex items-center gap-3">
@@ -129,6 +157,14 @@ export function UpdateProfileForm() {
           </div>
         </form>
       </div>
+
+      <AvatarUpload
+        currentAvatar={profile?.avatar}
+        userName={profile?.name}
+        onUpload={handleUploadAvatar}
+        onRemove={handleRemoveAvatar}
+        isLoading={isUploadingAvatar}
+      />
     </div>
   );
 }
