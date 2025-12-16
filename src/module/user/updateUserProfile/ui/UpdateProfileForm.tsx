@@ -1,15 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import { User, FileText } from 'lucide-react';
 import { GradientButton } from '@/components/app/common/GradientButton';
 import { IconInput } from '@/components/app/common/IconInput';
 import { IconTextarea } from '@/components/app/common/IconTextarea';
-import { fetchUserProfile, updateProfile } from '@/services/user.service';
-import { useSession } from '@/lib/auth/auth-client';
+import { useUserProfile } from '@/module/user/hooks/useUserProfile';
+import { useUpdateProfile } from '@/module/user/hooks/useUpdateProfile';
 
 interface UpdateProfileFormData {
   name: string;
@@ -17,10 +16,8 @@ interface UpdateProfileFormData {
 }
 
 export function UpdateProfileForm() {
-  const { data: session, refetch: refetchSession } = useSession();
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFetchingProfile, setIsFetchingProfile] = useState(true);
+  const { data: profile, isLoading: isFetchingProfile } = useUserProfile();
+  const updateProfileMutation = useUpdateProfile();
 
   const {
     register,
@@ -35,42 +32,22 @@ export function UpdateProfileForm() {
   });
 
   useEffect(() => {
-    const loadProfile = async () => {
-      if (!session?.user?.id) {
-        setIsFetchingProfile(false);
-        return;
-      }
-
-      try {
-        const profile = await fetchUserProfile();
-        reset({
-          name: profile.name || '',
-          bio: profile.bio || '',
-        });
-      } catch (error) {
-        console.error('Erreur lors du chargement du profil:', error);
-        toast.error('Erreur lors du chargement du profil');
-      } finally {
-        setIsFetchingProfile(false);
-      }
-    };
-
-    loadProfile();
-  }, [session?.user?.id, reset]);
+    if (profile) {
+      reset({
+        name: profile.name || '',
+        bio: profile.bio || '',
+      });
+    }
+  }, [profile, reset]);
 
   const onSubmit = async (data: UpdateProfileFormData) => {
-    setIsLoading(true);
-
     try {
-      await updateProfile({
+      await updateProfileMutation.mutateAsync({
         name: data.name.trim() || null,
         bio: data.bio.trim() || null,
       });
 
       toast.success('Profil mis à jour avec succès !');
-
-      await refetchSession();
-      router.refresh();
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
       toast.error(
@@ -78,8 +55,6 @@ export function UpdateProfileForm() {
           ? error.message
           : 'Une erreur est survenue lors de la mise à jour'
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -116,7 +91,7 @@ export function UpdateProfileForm() {
             placeholder="Votre nom (optionnel)"
             error={errors.name?.message}
             helperText="Maximum 100 caractères"
-            disabled={isLoading}
+            disabled={updateProfileMutation.isPending}
             {...register('name', {
               maxLength: {
                 value: 100,
@@ -133,7 +108,7 @@ export function UpdateProfileForm() {
             rows={5}
             error={errors.bio?.message}
             helperText="Maximum 500 caractères"
-            disabled={isLoading}
+            disabled={updateProfileMutation.isPending}
             {...register('bio', {
               maxLength: {
                 value: 500,
@@ -145,7 +120,7 @@ export function UpdateProfileForm() {
           <div className="pt-4 border-t border-white/10">
             <GradientButton
               type="submit"
-              isLoading={isLoading}
+              isLoading={updateProfileMutation.isPending}
               loadingText="Mise à jour..."
               className="w-full"
             >
