@@ -2,20 +2,19 @@
 
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, X, ImageIcon } from 'lucide-react';
+import { Upload, ImageIcon } from 'lucide-react';
 import Cropper from 'react-easy-crop';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { GradientButton } from '@/components/app/common/GradientButton';
 import { RedButton } from '@/components/app/common/RedButton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CustomModal } from '@/components/app/common/CustomModal';
-import { AVATAR_VALIDATION } from '../types/updateUserProfile.types';
+import { AVATAR_VALIDATION } from '../types/updateUserAvatar.types';
 
 interface AvatarUploadProps {
   currentAvatar?: string | null;
   userName?: string | null;
   onUpload: (file: File) => Promise<void>;
-  onRemove: () => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -74,7 +73,6 @@ export function AvatarUpload({
   currentAvatar,
   userName,
   onUpload,
-  onRemove,
   isLoading = false,
 }: AvatarUploadProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -169,15 +167,6 @@ export function AvatarUpload({
     }
   };
 
-  const handleRemove = async () => {
-    await onRemove();
-    setSelectedFile(null);
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-      setPreviewUrl(null);
-    }
-  };
-
   const displayAvatar = previewUrl || currentAvatar;
   const initials = userName?.[0]?.toUpperCase() || '?';
 
@@ -249,31 +238,22 @@ export function AvatarUpload({
             </div>
           )}
 
-          <div className="flex gap-4">
-            {selectedFile ? (
-              <>
-                <RedButton onClick={handleCancel} disabled={isLoading}>
-                  Annuler
-                </RedButton>
-                <GradientButton
-                  onClick={handleUpload}
-                  disabled={isLoading}
-                  isLoading={isLoading}
-                  loadingText="Upload en cours..."
-                  className="flex-1"
-                >
-                  Enregistrer
-                </GradientButton>
-              </>
-            ) : (
-              currentAvatar && (
-                <RedButton onClick={handleRemove} disabled={isLoading}>
-                  <X className="w-4 h-4 mr-2" />
-                  Supprimer l&apos;avatar
-                </RedButton>
-              )
-            )}
-          </div>
+          {selectedFile && (
+            <div className="flex gap-4">
+              <RedButton onClick={handleCancel} disabled={isLoading}>
+                Annuler
+              </RedButton>
+              <GradientButton
+                onClick={handleUpload}
+                disabled={isLoading}
+                isLoading={isLoading}
+                loadingText="Upload en cours..."
+                className="flex-1"
+              >
+                Enregistrer
+              </GradientButton>
+            </div>
+          )}
         </CardContent>
       </Card>
 
