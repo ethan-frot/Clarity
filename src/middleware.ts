@@ -1,6 +1,18 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { auth } from '@/lib/auth/better-auth';
+
+/**
+ * Middleware Edge-compatible (sans Prisma)
+ *
+ * Vérifie uniquement la PRÉSENCE du cookie de session Better Auth.
+ * La validation complète de la session (signature, expiration, DB) se fait
+ * dans les API routes via getSession().
+ *
+ * Pourquoi ? Prisma n'est pas compatible avec l'Edge Runtime de Vercel.
+ * Ce middleware est "optimiste" : il fait confiance au cookie pour l'accès initial.
+ */
+
+const SESSION_COOKIE_NAME = 'better-auth.session_token';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -26,16 +38,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const session = await auth.api.getSession({ headers: request.headers });
+  // Vérification "légère" : présence du cookie de session
+  // La validation complète se fait dans les API routes via getSession()
+  const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
 
-  if (!session) {
+  if (!sessionCookie?.value) {
     // API routes : Retourner JSON 401
     if (pathname.startsWith('/api')) {
       return Response.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
     // Pages : Rediriger vers /signin
-    // Paramètre redirect pour revenir après login (meilleure UX)
     const signInUrl = new URL('/signin', request.url);
     signInUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(signInUrl);

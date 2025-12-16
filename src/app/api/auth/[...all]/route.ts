@@ -14,4 +14,7 @@
 import { auth } from '@/lib/auth/better-auth';
 import { toNextJsHandler } from 'better-auth/next-js';
 
+// Force Node.js runtime (Prisma n'est pas compatible avec Edge Runtime)
+export const runtime = 'nodejs';
+
 export const { GET, POST } = toNextJsHandler(auth);
