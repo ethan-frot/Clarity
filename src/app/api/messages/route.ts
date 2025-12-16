@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { getSession } from '@/lib/auth/auth-helpers';
 import { CreateMessageUseCase } from '@/module/message/createMessage/CreateMessageUseCase';
 import { CreateMessagePrismaRepository } from '@/module/message/createMessage/CreateMessagePrismaRepository';
+import { createMessageSchema, validateRequest } from '@/lib/validation';
 
 /**
  * POST /api/messages - Créer un message dans une conversation (US-6)
@@ -15,15 +16,21 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    const { content, conversationId } = await request.json();
+    const body = await request.json();
+
+    const validation = validateRequest(createMessageSchema, body);
+
+    if (!validation.success) {
+      return Response.json({ error: validation.error }, { status: 400 });
+    }
 
     const repository = new CreateMessagePrismaRepository();
     const useCase = new CreateMessageUseCase(repository);
 
     const result = await useCase.execute({
-      content,
+      content: validation.data.content,
       authorId: session.user.id,
-      conversationId,
+      conversationId: validation.data.conversationId,
     });
 
     return Response.json(result, { status: 201 });

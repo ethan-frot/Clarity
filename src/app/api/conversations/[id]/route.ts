@@ -13,6 +13,7 @@ import { UpdateConversationUseCase } from '@/module/conversation/updateConversat
 import { UpdateConversationPrismaRepository } from '@/module/conversation/updateConversation/UpdateConversationPrismaRepository';
 import { DeleteConversationUseCase } from '@/module/conversation/deleteConversation/DeleteConversationUseCase';
 import { DeleteConversationPrismaRepository } from '@/module/conversation/deleteConversation/DeleteConversationPrismaRepository';
+import { updateConversationSchema, validateRequest } from '@/lib/validation';
 
 /**
  * GET /api/conversations/[id] (US-3)
@@ -66,10 +67,11 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { title } = body;
 
-    if (!title) {
-      return Response.json({ error: 'Le titre est requis' }, { status: 400 });
+    const validation = validateRequest(updateConversationSchema, body);
+
+    if (!validation.success) {
+      return Response.json({ error: validation.error }, { status: 400 });
     }
 
     const repository = new UpdateConversationPrismaRepository();
@@ -77,7 +79,7 @@ export async function PATCH(
 
     await useCase.execute({
       conversationId: id,
-      newTitle: title,
+      newTitle: validation.data.title,
       userId: session.user.id,
     });
 
@@ -92,10 +94,6 @@ export async function PATCH(
 
       if (error.message.includes('Non autorisé')) {
         return Response.json({ error: error.message }, { status: 403 });
-      }
-
-      if (error.message.includes('titre')) {
-        return Response.json({ error: error.message }, { status: 400 });
       }
 
       return Response.json({ error: error.message }, { status: 500 });

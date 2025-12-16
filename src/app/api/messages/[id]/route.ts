@@ -10,6 +10,7 @@ import { UpdateMessageUseCase } from '@/module/message/updateMessage/UpdateMessa
 import { UpdateMessagePrismaRepository } from '@/module/message/updateMessage/UpdateMessagePrismaRepository';
 import { DeleteMessageUseCase } from '@/module/message/deleteMessage/DeleteMessageUseCase';
 import { DeleteMessagePrismaRepository } from '@/module/message/deleteMessage/DeleteMessagePrismaRepository';
+import { updateMessageSchema, validateRequest } from '@/lib/validation';
 
 export async function PATCH(
   request: NextRequest,
@@ -22,10 +23,12 @@ export async function PATCH(
     }
 
     const { id } = await params;
-    const { content } = await request.json();
+    const body = await request.json();
 
-    if (!content) {
-      return Response.json({ error: 'Le contenu est requis' }, { status: 400 });
+    const validation = validateRequest(updateMessageSchema, body);
+
+    if (!validation.success) {
+      return Response.json({ error: validation.error }, { status: 400 });
     }
 
     const repository = new UpdateMessagePrismaRepository();
@@ -34,7 +37,7 @@ export async function PATCH(
     await useCase.execute({
       messageId: id,
       userId: session.user.id,
-      content,
+      content: validation.data.content,
     });
 
     return Response.json({ success: true }, { status: 200 });

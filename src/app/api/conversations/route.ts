@@ -10,6 +10,10 @@ import { CreateConversationUseCase } from '@/module/conversation/createConversat
 import { CreateConversationPrismaRepository } from '@/module/conversation/createConversation/CreateConversationPrismaRepository';
 import { ListConversationsUseCase } from '@/module/conversation/listConversations/ListConversationsUseCase';
 import { ListConversationsPrismaRepository } from '@/module/conversation/listConversations/ListConversationsPrismaRepository';
+import {
+  createConversationWithFirstMessageSchema,
+  validateRequest,
+} from '@/lib/validation';
 
 /**
  * GET /api/conversations (US-2)
@@ -52,21 +56,22 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, content } = body;
 
-    if (!title || !content) {
-      return Response.json(
-        { error: 'Le titre et le contenu sont requis' },
-        { status: 400 }
-      );
+    const validation = validateRequest(
+      createConversationWithFirstMessageSchema,
+      body
+    );
+
+    if (!validation.success) {
+      return Response.json({ error: validation.error }, { status: 400 });
     }
 
     const repository = new CreateConversationPrismaRepository();
     const useCase = new CreateConversationUseCase(repository);
 
     const result = await useCase.execute({
-      title,
-      content,
+      title: validation.data.title,
+      content: validation.data.content,
       authorId: session.user.id,
     });
 
@@ -75,14 +80,6 @@ export async function POST(request: NextRequest) {
     console.error('Erreur lors de la création de la conversation:', error);
 
     if (error instanceof Error) {
-      if (
-        error.message.includes('titre') ||
-        error.message.includes('contenu') ||
-        error.message.includes('auteur')
-      ) {
-        return Response.json({ error: error.message }, { status: 400 });
-      }
-
       return Response.json({ error: error.message }, { status: 400 });
     }
 
