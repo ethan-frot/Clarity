@@ -12,13 +12,17 @@ export async function createTestUser(
   prisma: PrismaClient,
   overrides?: {
     email?: string;
-    name?: string;
+    name?: string | null;
     password?: string;
+    bio?: string | null;
+    avatar?: string | null;
   }
 ): Promise<TestUser> {
   const email = overrides?.email || `test-${Date.now()}@example.com`;
-  const name = overrides?.name || 'Test User';
+  const name = overrides?.name !== undefined ? overrides.name : 'Test User';
   const password = overrides?.password || 'SecurePass123!';
+  const bio = overrides?.bio !== undefined ? overrides.bio : null;
+  const avatar = overrides?.avatar !== undefined ? overrides.avatar : null;
 
   const hashedPassword = await hashPassword(password);
 
@@ -26,6 +30,8 @@ export async function createTestUser(
     data: {
       email,
       name,
+      bio,
+      avatar,
       emailVerified: true, // Considéré comme vérifié pour éviter la vérification email dans les tests
     },
   });
