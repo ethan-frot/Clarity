@@ -10,6 +10,7 @@ import { IconTextarea } from '@/components/app/common/IconTextarea';
 import { useUserProfile } from '@/module/user/hooks/useUserProfile';
 import { useUpdateProfile } from '@/module/user/hooks/useUpdateProfile';
 import { AvatarUpload } from '@/module/user/updateUserAvatar/ui/AvatarUpload';
+import { UserProfileCard } from '@/components/app/user/shared/UserProfileCard';
 
 interface UpdateProfileFormData {
   name: string;
@@ -25,6 +26,7 @@ export function UpdateProfileForm() {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<UpdateProfileFormData>({
     defaultValues: {
@@ -32,6 +34,9 @@ export function UpdateProfileForm() {
       bio: '',
     },
   });
+
+  const watchedName = watch('name');
+  const watchedBio = watch('bio');
 
   useEffect(() => {
     if (profile) {
@@ -108,6 +113,13 @@ export function UpdateProfileForm() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      <UserProfileCard
+        name={watchedName || profile?.name || null}
+        avatar={profile?.avatar || null}
+        bio={watchedBio || profile?.bio || null}
+        isPreview
+      />
+
       <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
         <div className="space-y-3 mb-6">
           <h2 className="text-2xl font-bold text-white flex items-center gap-3">
