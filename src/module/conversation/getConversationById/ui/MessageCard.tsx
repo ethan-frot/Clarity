@@ -12,6 +12,7 @@ interface AuthorInfo {
   id: string;
   name: string | null;
   email: string;
+  avatar: string | null;
 }
 
 interface MessageCardProps {
@@ -54,6 +55,7 @@ export function MessageCard({ message, conversationId }: MessageCardProps) {
                 userId={message.author.id}
                 userName={message.author.name}
                 userEmail={message.author.email}
+                userAvatar={message.author.avatar}
               />
               <div className="flex items-center gap-1.5 text-xs text-white/50">
                 <Clock className="h-3 w-3" />

@@ -22,6 +22,7 @@ export class ListConversationsPrismaRepository implements ListConversationsRepos
             id: true,
             name: true,
             email: true,
+            avatar: true,
           },
         },
         messages: {
@@ -77,6 +78,7 @@ export class ListConversationsPrismaRepository implements ListConversationsRepos
           id: conv.author.id,
           name: conv.author.name,
           email: conv.author.email,
+          avatar: conv.author.avatar,
         },
         lastMessage: conv.messages[0]
           ? {

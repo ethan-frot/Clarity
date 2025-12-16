@@ -103,6 +103,7 @@ export function ConversationDetail({
                   userId={conversation.author.id}
                   userName={conversation.author.name}
                   userEmail={conversation.author.email}
+                  userAvatar={conversation.author.avatar}
                   size="lg"
                 />
               </div>

@@ -10,6 +10,7 @@ interface AuthorInfo {
   id: string;
   name: string | null;
   email: string;
+  avatar: string | null;
 }
 
 interface LastMessage {
@@ -44,6 +45,7 @@ export function ConversationCard({ conversation }: ConversationCardProps) {
               userId={conversation.author.id}
               userName={conversation.author.name}
               userEmail={conversation.author.email}
+              userAvatar={conversation.author.avatar}
             />
           </div>
           {createdDate && (

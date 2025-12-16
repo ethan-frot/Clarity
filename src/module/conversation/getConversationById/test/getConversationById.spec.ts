@@ -34,6 +34,7 @@ describe('GetConversationByIdUseCase (US-3)', () => {
         id: 'user-123',
         name: 'Alice',
         email: 'alice@example.com',
+        avatar: null,
       },
       messages: [
         {
@@ -46,6 +47,7 @@ describe('GetConversationByIdUseCase (US-3)', () => {
             id: 'user-123',
             name: 'Alice',
             email: 'alice@example.com',
+            avatar: null,
           },
         },
         {
@@ -58,6 +60,7 @@ describe('GetConversationByIdUseCase (US-3)', () => {
             id: 'user-456',
             name: 'Bob',
             email: 'bob@example.com',
+            avatar: null,
           },
         },
         {
@@ -70,6 +73,7 @@ describe('GetConversationByIdUseCase (US-3)', () => {
             id: 'user-123',
             name: 'Alice',
             email: 'alice@example.com',
+            avatar: null,
           },
         },
       ],

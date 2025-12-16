@@ -2,6 +2,7 @@ export interface AuthorInfo {
   id: string;
   name: string | null;
   email: string;
+  avatar: string | null;
 }
 
 export interface MessageWithAuthor {

@@ -22,6 +22,7 @@ export class GetConversationByIdPrismaRepository implements GetConversationByIdR
             id: true,
             name: true,
             email: true,
+            avatar: true,
           },
         },
         messages: {
@@ -37,6 +38,7 @@ export class GetConversationByIdPrismaRepository implements GetConversationByIdR
                 id: true,
                 name: true,
                 email: true,
+                avatar: true,
               },
             },
           },
@@ -58,6 +60,7 @@ export class GetConversationByIdPrismaRepository implements GetConversationByIdR
         id: conversation.author.id,
         name: conversation.author.name,
         email: conversation.author.email,
+        avatar: conversation.author.avatar,
       },
       messages: conversation.messages.map((msg) => ({
         id: msg.id,
@@ -69,6 +72,7 @@ export class GetConversationByIdPrismaRepository implements GetConversationByIdR
           id: msg.author.id,
           name: msg.author.name,
           email: msg.author.email,
+          avatar: msg.author.avatar,
         },
       })),
     };

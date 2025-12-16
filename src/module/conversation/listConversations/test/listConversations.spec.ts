@@ -48,15 +48,30 @@ describe('ListConversationsUseCase (US-2)', () => {
     const conversationsWithCount: ConversationWithCount[] = [
       Object.assign(conv1, {
         messageCount: 5,
-        author: { id: 'user-1', name: 'User 1', email: 'user1@example.com' },
+        author: {
+          id: 'user-1',
+          name: 'User 1',
+          email: 'user1@example.com',
+          avatar: null,
+        },
       }),
       Object.assign(conv2, {
         messageCount: 3,
-        author: { id: 'user-2', name: 'User 2', email: 'user2@example.com' },
+        author: {
+          id: 'user-2',
+          name: 'User 2',
+          email: 'user2@example.com',
+          avatar: null,
+        },
       }),
       Object.assign(conv3, {
         messageCount: 10,
-        author: { id: 'user-3', name: 'User 3', email: 'user3@example.com' },
+        author: {
+          id: 'user-3',
+          name: 'User 3',
+          email: 'user3@example.com',
+          avatar: null,
+        },
       }),
     ];
 
@@ -96,11 +111,21 @@ describe('ListConversationsUseCase (US-2)', () => {
     const conversationsWithCount: ConversationWithCount[] = [
       Object.assign(conv1, {
         messageCount: 5,
-        author: { id: 'user-1', name: 'User 1', email: 'user1@example.com' },
+        author: {
+          id: 'user-1',
+          name: 'User 1',
+          email: 'user1@example.com',
+          avatar: null,
+        },
       }),
       Object.assign(conv2, {
         messageCount: 3,
-        author: { id: 'user-2', name: 'User 2', email: 'user2@example.com' },
+        author: {
+          id: 'user-2',
+          name: 'User 2',
+          email: 'user2@example.com',
+          avatar: null,
+        },
       }),
     ];
 
@@ -142,7 +167,12 @@ describe('ListConversationsUseCase (US-2)', () => {
     const conversationsWithCount: ConversationWithCount[] = [
       Object.assign(conv1, {
         messageCount: 15,
-        author: { id: 'user-1', name: 'User 1', email: 'user1@example.com' },
+        author: {
+          id: 'user-1',
+          name: 'User 1',
+          email: 'user1@example.com',
+          avatar: null,
+        },
       }),
     ];
 

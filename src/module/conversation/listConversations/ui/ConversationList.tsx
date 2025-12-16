@@ -10,6 +10,7 @@ interface AuthorInfo {
   id: string;
   name: string | null;
   email: string;
+  avatar: string | null;
 }
 
 interface LastMessage {
