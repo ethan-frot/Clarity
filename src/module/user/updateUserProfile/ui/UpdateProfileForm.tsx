@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 import { User, FileText } from 'lucide-react';
 import { GradientButton } from '@/components/app/common/GradientButton';
 import { IconInput } from '@/components/app/common/IconInput';
 import { IconTextarea } from '@/components/app/common/IconTextarea';
-import { updateProfile } from '@/services/user.service';
+import { fetchUserProfile, updateProfile } from '@/services/user.service';
 import { useSession } from '@/lib/auth/auth-client';
 
 interface UpdateProfileFormData {
@@ -16,19 +17,46 @@ interface UpdateProfileFormData {
 }
 
 export function UpdateProfileForm() {
-  const { data: session } = useSession();
+  const { data: session, refetch: refetchSession } = useSession();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingProfile, setIsFetchingProfile] = useState(true);
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<UpdateProfileFormData>({
     defaultValues: {
-      name: session?.user?.name || '',
-      bio: '', // TODO: Récupérer depuis l'API quand endpoint GET disponible
+      name: '',
+      bio: '',
     },
   });
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!session?.user?.id) {
+        setIsFetchingProfile(false);
+        return;
+      }
+
+      try {
+        const profile = await fetchUserProfile();
+        reset({
+          name: profile.name || '',
+          bio: profile.bio || '',
+        });
+      } catch (error) {
+        console.error('Erreur lors du chargement du profil:', error);
+        toast.error('Erreur lors du chargement du profil');
+      } finally {
+        setIsFetchingProfile(false);
+      }
+    };
+
+    loadProfile();
+  }, [session?.user?.id, reset]);
 
   const onSubmit = async (data: UpdateProfileFormData) => {
     setIsLoading(true);
@@ -40,6 +68,9 @@ export function UpdateProfileForm() {
       });
 
       toast.success('Profil mis à jour avec succès !');
+
+      await refetchSession();
+      router.refresh();
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
       toast.error(
@@ -51,6 +82,18 @@ export function UpdateProfileForm() {
       setIsLoading(false);
     }
   };
+
+  if (isFetchingProfile) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
+          <div className="flex items-center justify-center py-12">
+            <div className="text-white/70">Chargement du profil...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto">
