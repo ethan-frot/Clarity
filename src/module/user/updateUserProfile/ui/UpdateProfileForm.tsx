@@ -9,7 +9,7 @@ import { IconInput } from '@/components/app/common/IconInput';
 import { IconTextarea } from '@/components/app/common/IconTextarea';
 import { useUserProfile } from '@/module/user/hooks/useUserProfile';
 import { useUpdateProfile } from '@/module/user/hooks/useUpdateProfile';
-import { AvatarUpload } from './AvatarUpload';
+import { AvatarUpload } from '@/module/user/updateUserAvatar/ui/AvatarUpload';
 
 interface UpdateProfileFormData {
   name: string;
@@ -45,23 +45,31 @@ export function UpdateProfileForm() {
   const handleUploadAvatar = async (file: File) => {
     setIsUploadingAvatar(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      toast.success(`Avatar uploadé : ${file.name} (mock)`);
-    } catch (error) {
-      toast.error("Erreur lors de l'upload de l'avatar");
-      console.error(error);
-    } finally {
-      setIsUploadingAvatar(false);
-    }
-  };
+      const formData = new FormData();
+      formData.append('file', file);
 
-  const handleRemoveAvatar = async () => {
-    setIsUploadingAvatar(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast.success('Avatar supprimé (mock)');
+      const response = await fetch('/api/users/profile/avatar', {
+        method: 'PATCH',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Erreur lors de l'upload");
+      }
+
+      toast.success('Avatar mis à jour avec succès !');
+
+      await updateProfileMutation.mutateAsync({
+        name: profile?.name || null,
+        bio: profile?.bio || null,
+      });
     } catch (error) {
-      toast.error("Erreur lors de la suppression de l'avatar");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de l'upload de l'avatar"
+      );
       console.error(error);
     } finally {
       setIsUploadingAvatar(false);
@@ -162,7 +170,6 @@ export function UpdateProfileForm() {
         currentAvatar={profile?.avatar}
         userName={profile?.name}
         onUpload={handleUploadAvatar}
-        onRemove={handleRemoveAvatar}
         isLoading={isUploadingAvatar}
       />
     </div>
