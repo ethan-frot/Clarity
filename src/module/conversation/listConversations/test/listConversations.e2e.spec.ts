@@ -1,3 +1,5 @@
+jest.mock('@/lib/auth/auth-helpers');
+
 import {
   setupE2EDatabase,
   cleanDatabase,

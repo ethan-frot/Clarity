@@ -1,3 +1,6 @@
+jest.mock('@/lib/auth/auth-helpers');
+jest.mock('@/services/vercel-blob-avatar-upload.service');
+
 import {
   setupE2EDatabase,
   cleanDatabase,
@@ -7,9 +10,6 @@ import {
 import { createTestUser } from '@/../test/auth-helpers';
 import { PATCH } from '@/app/api/users/profile/avatar/route';
 import { NextRequest } from 'next/server';
-
-jest.mock('@/lib/auth/auth-helpers');
-jest.mock('@/services/vercel-blob-avatar-upload.service');
 
 let context: E2ETestContext;
 

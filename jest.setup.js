@@ -19,13 +19,13 @@ global.console = {
 jest.setTimeout(60000); // 60 secondes
 
 /**
- * Mock global de better-auth pour les tests
+ * Mock global de better-auth pour les tests E2E
  *
  * Better-auth utilise des modules ESM que Jest ne peut pas transformer correctement.
- * Ce mock permet aux tests E2E de s'exécuter sans dépendre du vrai module.
+ * On mock directement notre wrapper src/lib/auth/better-auth.ts pour éviter de charger le package.
  */
-jest.mock('better-auth', () => ({
-  betterAuth: jest.fn(() => ({
+jest.mock('@/lib/auth/better-auth', () => ({
+  auth: {
     api: {
       getSession: jest.fn(),
       signIn: jest.fn(),
@@ -33,12 +33,5 @@ jest.mock('better-auth', () => ({
       signUp: jest.fn(),
     },
     handler: jest.fn(),
-  })),
-}));
-
-/**
- * Mock de better-auth/adapters/prisma
- */
-jest.mock('better-auth/adapters/prisma', () => ({
-  prismaAdapter: jest.fn(() => ({})),
+  },
 }));

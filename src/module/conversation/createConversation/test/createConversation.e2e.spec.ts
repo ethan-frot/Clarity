@@ -1,3 +1,5 @@
+jest.mock('@/lib/auth/auth-helpers');
+
 import {
   setupE2EDatabase,
   cleanDatabase,
@@ -7,8 +9,6 @@ import {
 import { createTestUser } from '@/../test/auth-helpers';
 import { POST } from '@/app/api/conversations/route';
 import { NextRequest } from 'next/server';
-
-jest.mock('@/lib/auth/auth-helpers');
 
 let context: E2ETestContext;
 

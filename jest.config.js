@@ -53,7 +53,9 @@ const customJestConfig = {
 
   // Ignore patterns
   testPathIgnorePatterns: ['/node_modules/', '/.next/'],
-  transformIgnorePatterns: ['/node_modules/'],
+  transformIgnorePatterns: [
+    '/node_modules/(?!better-auth)/',
+  ],
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config
