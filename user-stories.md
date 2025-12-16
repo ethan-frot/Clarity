@@ -668,53 +668,6 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
 
 ---
 
-### US-16: Récupérer mon profil utilisateur
-
-**En tant qu'utilisateur authentifié,**
-**Je veux récupérer mes informations de profil,**
-**Afin de les afficher ou de pré-remplir un formulaire de modification**
-
-**Règles métier :**
-
-- L'utilisateur **doit être authentifié**
-- Retourne les informations du profil de l'utilisateur connecté : `id`, `email`, `name`, `bio`, `avatar`
-- **Ne jamais exposer** : `password`, `createdAt`, `updatedAt`
-- Les champs `name`, `bio` et `avatar` **peuvent être `null`** s'ils n'ont pas été renseignés
-- Retourne **401 Unauthorized** si non authentifié
-
-**Exemples / Scénarios :**
-
-- **Exemple 1 / Scénario 1 : Récupération réussie avec informations complètes**
-  - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-123"
-  - **Et** que son profil contient : name = "John Doe", bio = "Software Developer", avatar = "https://cdn.example.com/avatar.jpg"
-  - **Quand** il récupère son profil
-  - **Alors** les informations suivantes doivent être retournées :
-    - `id` : "user-123"
-    - `email` : "john@example.com"
-    - `name` : "John Doe"
-    - `bio` : "Software Developer"
-    - `avatar` : "https://cdn.example.com/avatar.jpg"
-  - **Et** le statut HTTP doit être **200 OK**
-
-- **Exemple 2 / Scénario 2 : Récupération réussie avec informations minimales**
-  - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-456"
-  - **Et** que son profil contient : name = `null`, bio = `null`, avatar = `null`
-  - **Quand** il récupère son profil
-  - **Alors** les informations suivantes doivent être retournées :
-    - `id` : "user-456"
-    - `email` : "jane@example.com"
-    - `name` : `null`
-    - `bio` : `null`
-    - `avatar` : `null`
-  - **Et** le statut HTTP doit être **200 OK**
-
-- **Exemple 3 / Scénario 3 : Récupération échouée - non authentifié**
-  - **Étant donné** qu'aucun utilisateur n'est authentifié
-  - **Quand** on tente de récupérer le profil
-  - **Alors** une erreur **401 Unauthorized** doit être retournée
-
----
-
 ### US-15a: Modifier nom et bio du profil
 
 **En tant qu'utilisateur authentifié,**
@@ -923,6 +876,53 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
 - **Exemple 7 / Scénario 7 : Changement échoué - non authentifié**
   - **Étant donné** qu'aucun utilisateur n'est authentifié
   - **Quand** on tente de changer un mot de passe
+  - **Alors** une erreur **401 Unauthorized** doit être retournée
+
+---
+
+### US-16: Récupérer mon profil utilisateur
+
+**En tant qu'utilisateur authentifié,**
+**Je veux récupérer mes informations de profil,**
+**Afin de les afficher ou de pré-remplir un formulaire de modification**
+
+**Règles métier :**
+
+- L'utilisateur **doit être authentifié**
+- Retourne les informations du profil de l'utilisateur connecté : `id`, `email`, `name`, `bio`, `avatar`
+- **Ne jamais exposer** : `password`, `createdAt`, `updatedAt`
+- Les champs `name`, `bio` et `avatar` **peuvent être `null`** s'ils n'ont pas été renseignés
+- Retourne **401 Unauthorized** si non authentifié
+
+**Exemples / Scénarios :**
+
+- **Exemple 1 / Scénario 1 : Récupération réussie avec informations complètes**
+  - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-123"
+  - **Et** que son profil contient : name = "John Doe", bio = "Software Developer", avatar = "https://cdn.example.com/avatar.jpg"
+  - **Quand** il récupère son profil
+  - **Alors** les informations suivantes doivent être retournées :
+    - `id` : "user-123"
+    - `email` : "john@example.com"
+    - `name` : "John Doe"
+    - `bio` : "Software Developer"
+    - `avatar` : "https://cdn.example.com/avatar.jpg"
+  - **Et** le statut HTTP doit être **200 OK**
+
+- **Exemple 2 / Scénario 2 : Récupération réussie avec informations minimales**
+  - **Étant donné** qu'un utilisateur est authentifié avec l'ID "user-456"
+  - **Et** que son profil contient : name = `null`, bio = `null`, avatar = `null`
+  - **Quand** il récupère son profil
+  - **Alors** les informations suivantes doivent être retournées :
+    - `id` : "user-456"
+    - `email` : "jane@example.com"
+    - `name` : `null`
+    - `bio` : `null`
+    - `avatar` : `null`
+  - **Et** le statut HTTP doit être **200 OK**
+
+- **Exemple 3 / Scénario 3 : Récupération échouée - non authentifié**
+  - **Étant donné** qu'aucun utilisateur n'est authentifié
+  - **Quand** on tente de récupérer le profil
   - **Alors** une erreur **401 Unauthorized** doit être retournée
 
 ---
