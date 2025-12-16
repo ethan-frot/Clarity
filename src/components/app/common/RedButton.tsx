@@ -26,7 +26,7 @@ export const RedButton = forwardRef<HTMLButtonElement, RedButtonProps>(
       <Button
         ref={ref}
         disabled={isLoading}
-        className={`cursor-pointer bg-linear-to-r from-red-500/90 to-red-600/90 hover:from-red-500 hover:to-red-600 text-white font-semibold shadow-md shadow-red-500/10 transition-all duration-300 hover:shadow-red-500/20 hover:scale-[1.01] ${className || ''}`}
+        className={`w-full cursor-pointer bg-linear-to-r from-red-500/90 to-red-600/90 hover:from-red-500 hover:to-red-600 text-white font-semibold shadow-md shadow-red-500/10 transition-all duration-300 hover:shadow-red-500/20 hover:scale-[1.01] ${className || ''}`}
         size={size}
         {...props}
       >
