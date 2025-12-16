@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Lock } from 'lucide-react';
 import {
@@ -10,6 +9,7 @@ import {
   PASSWORD_VALIDATION,
 } from '@/components/app/common/form';
 import { GradientButton } from '@/components/app/common/GradientButton';
+import { changePassword } from '@/lib/auth/auth-client';
 
 interface UpdatePasswordFormData {
   oldPassword: string;
@@ -24,10 +24,9 @@ interface UpdatePasswordFormData {
  * - Ancien mot de passe obligatoire pour vérification
  * - Nouveau mot de passe : min 8 caractères, 1 maj, 1 min, 1 chiffre, 1 caractère spécial
  * - Confirmation doit matcher le nouveau mot de passe
- * - Après succès : toutes les sessions invalidées + déconnexion automatique
+ * - Après succès : toutes les autres sessions invalidées (session actuelle conservée)
  */
 export function UpdatePasswordForm() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -43,29 +42,20 @@ export function UpdatePasswordForm() {
     setIsLoading(true);
 
     try {
-      // TODO: Appel API réel à implémenter
-      const response = await fetch('/api/users/change-password', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          oldPassword: data.oldPassword,
-          newPassword: data.newPassword,
-        }),
+      const { error } = await changePassword({
+        currentPassword: data.oldPassword,
+        newPassword: data.newPassword,
+        revokeOtherSessions: true,
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        toast.error(error.error || 'Erreur lors du changement de mot de passe');
+      if (error) {
+        toast.error(
+          error.message || 'Erreur lors du changement de mot de passe'
+        );
         return;
       }
 
-      toast.success('Mot de passe modifié avec succès. Redirection...');
-
-      // Rediriger vers la page de connexion après 1.5 secondes (l'utilisateur est déconnecté)
-      setTimeout(() => {
-        router.push('/sign-in?redirect=/settings');
-        router.refresh();
-      }, 1500);
+      toast.success('Mot de passe modifié avec succès.');
     } catch (error) {
       console.error('Erreur lors du changement de mot de passe:', error);
       toast.error('Une erreur inattendue est survenue');
