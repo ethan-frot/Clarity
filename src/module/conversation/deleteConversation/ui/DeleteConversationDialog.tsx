@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Trash2, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { CustomModal } from '@/components/app/common/CustomModal';
-import { GradientButton } from '@/components/app/common/GradientButton';
+import { RedButton } from '@/components/app/common/RedButton';
 import { deleteConversation } from '@/services/conversation.service';
 
 interface DeleteConversationDialogProps {
@@ -78,15 +78,14 @@ export function DeleteConversationDialog({
           </div>
 
           <div className="pt-4 border-t border-white/10 flex gap-3">
-            <GradientButton
+            <RedButton
               type="button"
               onClick={handleDelete}
               isLoading={mutation.isPending}
               loadingText="Suppression..."
-              className="flex-1 bg-linear-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
             >
               Supprimer
-            </GradientButton>
+            </RedButton>
           </div>
         </div>
       </CustomModal>
