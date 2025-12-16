@@ -10,7 +10,7 @@ import {
 import { ArrowLeft, KeyRound, TriangleAlert } from 'lucide-react';
 
 export const metadata = {
-  title: 'Réinitialiser le mot de passe | Forum',
+  title: 'Réinitialiser le mot de passe | Clarity',
   description: 'Définissez votre nouveau mot de passe',
 };
 

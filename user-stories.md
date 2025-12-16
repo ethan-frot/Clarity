@@ -1,4 +1,4 @@
-# User Stories - Forum Next.js
+# User Stories
 
 Ce fichier contient toutes les User Stories du projet avec leurs règles métier (format Given-When-Then).
 

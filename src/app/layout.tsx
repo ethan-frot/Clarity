@@ -22,7 +22,7 @@ const satoshi = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Forum | Architecture Clean & DDD',
+  title: 'Clarity',
   description:
     'Forum développé avec Clean Architecture et Domain-Driven Design',
 };

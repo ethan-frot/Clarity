@@ -16,22 +16,22 @@ interface PasswordResetEmailProps {
 }
 
 export default function PasswordResetEmail({
-  resetUrl = 'https://forum-nextjs.ethanfrot.com/reset-password?token=preview-token-123',
+  resetUrl = 'https://clarity.ethanfrot.com/reset-password?token=preview-token-123',
   userName,
 }: PasswordResetEmailProps) {
   // Extraire l'URL de base pour le lien du titre (avec fallback pour preview)
   const baseUrl = resetUrl
     ? new URL(resetUrl).origin
-    : 'https://forum-nextjs.ethanfrot.com';
+    : 'https://clarity.ethanfrot.com';
 
   return (
     <Html>
       <Head />
-      <Preview>Réinitialisez votre mot de passe - Forum-NextJs</Preview>
+      <Preview>Réinitialisez votre mot de passe - Clarity</Preview>
       <Body style={main}>
         <Container style={container}>
           <Link href={baseUrl} style={headingLink}>
-            Forum-NextJs
+            Clarity
           </Link>
 
           <div
@@ -50,8 +50,8 @@ export default function PasswordResetEmail({
 
             <Text style={paragraph}>
               Vous avez demandé la réinitialisation de votre mot de passe sur
-              Forum-NextJs. Cliquez sur le bouton ci-dessous pour créer un
-              nouveau mot de passe.
+              Clarity. Cliquez sur le bouton ci-dessous pour créer un nouveau
+              mot de passe.
             </Text>
 
             <div>
@@ -102,7 +102,7 @@ export default function PasswordResetEmail({
             }}
           />
 
-          <Text style={footer}>Forum-NextJs - Plateforme de discussions</Text>
+          <Text style={footer}>Clarity - Plateforme de discussions</Text>
         </Container>
       </Body>
     </Html>

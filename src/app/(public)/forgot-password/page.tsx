@@ -10,7 +10,7 @@ import {
 import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Mot de passe oublié | Forum',
+  title: 'Mot de passe oublié | Clarity',
   description: 'Réinitialisez votre mot de passe',
 };
 

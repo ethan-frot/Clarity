@@ -48,7 +48,7 @@ export const auth = betterAuth({
         await resend.emails.send({
           from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
           to: user.email,
-          subject: 'Réinitialisation de votre mot de passe - Forum-NextJs',
+          subject: 'Réinitialisation de votre mot de passe - Clarity',
           html: emailHtml,
         });
       } catch (error) {
@@ -129,7 +129,7 @@ export const auth = betterAuth({
           await resend.emails.send({
             from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
             to: email,
-            subject: 'Vérifiez votre adresse email - Forum-NextJs',
+            subject: 'Vérifiez votre adresse email - Clarity',
             html: emailHtml,
           });
         } catch (error) {

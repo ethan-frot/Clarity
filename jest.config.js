@@ -1,6 +1,4 @@
 /**
- * Configuration Jest pour le projet metodo-forum-nextjs
- *
  * Configuration pour les tests unitaires et E2E avec TypeScript
  * Pattern de fichiers :
  * - Tests unitaires : *.spec.ts

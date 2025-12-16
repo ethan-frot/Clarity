@@ -18,16 +18,16 @@ export default function EmailVerification({
   otpCode = '123456',
   userName,
 }: EmailVerificationProps) {
-  const baseUrl = 'https://forum-nextjs.ethanfrot.com';
+  const baseUrl = 'https://clarity.ethanfrot.com';
 
   return (
     <Html>
       <Head />
-      <Preview>Vérifiez votre adresse email - Forum-NextJs</Preview>
+      <Preview>Vérifiez votre adresse email - Clarity</Preview>
       <Body style={main}>
         <Container style={container}>
           <Link href={baseUrl} style={headingLink}>
-            Forum-NextJs
+            Clarity
           </Link>
 
           <div
@@ -45,9 +45,9 @@ export default function EmailVerification({
             </Text>
 
             <Text style={paragraph}>
-              Bienvenue sur Forum-NextJs ! Pour activer votre compte et
-              commencer à participer aux discussions, veuillez vérifier votre
-              adresse email en utilisant le code de vérification ci-dessous.
+              Bienvenue sur Clarity ! Pour activer votre compte et commencer à
+              participer aux discussions, veuillez vérifier votre adresse email
+              en utilisant le code de vérification ci-dessous.
             </Text>
 
             <div style={otpContainer}>
@@ -62,8 +62,8 @@ export default function EmailVerification({
             </Text>
 
             <Text style={note}>
-              Si vous n&apos;avez pas créé de compte sur Forum-NextJs, vous
-              pouvez ignorer cet email en toute sécurité.
+              Si vous n&apos;avez pas créé de compte sur Clarity, vous pouvez
+              ignorer cet email en toute sécurité.
             </Text>
           </Section>
 
@@ -76,7 +76,7 @@ export default function EmailVerification({
             }}
           />
 
-          <Text style={footer}>Forum-NextJs - Plateforme de discussions</Text>
+          <Text style={footer}>Clarity - Plateforme de discussions</Text>
         </Container>
       </Body>
     </Html>

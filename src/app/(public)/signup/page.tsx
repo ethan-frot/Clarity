@@ -10,7 +10,7 @@ import {
 import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Inscription | Forum',
+  title: 'Inscription | Clarity',
   description: 'Créez votre compte pour participer aux discussions',
 };
 

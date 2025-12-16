@@ -12,7 +12,7 @@ import {
 import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Connexion | Forum',
+  title: 'Connexion | Clarity',
   description: 'Connectez-vous pour participer aux discussions',
 };
 

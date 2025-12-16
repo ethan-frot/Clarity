@@ -1,4 +1,4 @@
-# 📋 Critères d'Évaluation - Projet Forum Next.js
+# 📋 Critères d'Évaluation
 
 > Ce document liste les exigences officielles du projet fournies par le professeur.
 > Source : `https://github.com/ThomasMouchelet/ESD_B3DW_nextjs-forum/blob/main/README.md`
