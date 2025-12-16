@@ -1,15 +1,27 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authClient, sendVerificationEmail } from '@/lib/auth/auth-client';
 import { toast } from 'sonner';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { GradientButton } from '@/components/app/common/GradientButton';
 import { Button } from '@/components/ui/button';
-import { Mail, CheckCircle2 } from 'lucide-react';
+import { Mail, CheckCircle2, Loader2 } from 'lucide-react';
 
-export default function VerifyEmailPage() {
+function VerifyEmailLoading() {
+  return (
+    <div className="container mx-auto px-4 py-12 max-w-md">
+      <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+        <CardContent className="pt-6 flex justify-center">
+          <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
@@ -236,5 +248,13 @@ export default function VerifyEmailPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<VerifyEmailLoading />}>
+      <VerifyEmailContent />
+    </Suspense>
   );
 }
