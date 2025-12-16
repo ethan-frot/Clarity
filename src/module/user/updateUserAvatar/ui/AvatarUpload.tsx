@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { toast } from 'sonner';
 import { Upload, ImageIcon } from 'lucide-react';
 import Cropper from 'react-easy-crop';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -9,14 +10,9 @@ import { GradientButton } from '@/components/app/common/GradientButton';
 import { RedButton } from '@/components/app/common/RedButton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CustomModal } from '@/components/app/common/CustomModal';
+import { useUserProfile } from '@/module/user/hooks/useUserProfile';
+import { useUpdateProfile } from '@/module/user/hooks/useUpdateProfile';
 import { AVATAR_VALIDATION } from '../types/updateUserAvatar.types';
-
-interface AvatarUploadProps {
-  currentAvatar?: string | null;
-  userName?: string | null;
-  onUpload: (file: File) => Promise<void>;
-  isLoading?: boolean;
-}
 
 interface CropData {
   x: number;
@@ -69,12 +65,10 @@ const getCroppedImg = async (
   });
 };
 
-export function AvatarUpload({
-  currentAvatar,
-  userName,
-  onUpload,
-  isLoading = false,
-}: AvatarUploadProps) {
+export function AvatarUpload() {
+  const { data: profile } = useUserProfile();
+  const updateProfileMutation = useUpdateProfile();
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showCropModal, setShowCropModal] = useState(false);
@@ -86,6 +80,10 @@ export function AvatarUpload({
     width: number;
     height: number;
   } | null>(null);
+
+  const currentAvatar = profile?.avatar;
+  const userName = profile?.name;
+  const isLoading = isUploadingAvatar;
 
   const { getRootProps, getInputProps, isDragActive, fileRejections } =
     useDropzone({
@@ -149,13 +147,44 @@ export function AvatarUpload({
   };
 
   const handleUpload = async () => {
-    if (selectedFile) {
-      await onUpload(selectedFile);
+    if (!selectedFile) return;
+
+    setIsUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      const response = await fetch('/api/users/profile/avatar', {
+        method: 'PATCH',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Erreur lors de l'upload");
+      }
+
+      toast.success('Avatar mis à jour avec succès !');
+
+      await updateProfileMutation.mutateAsync({
+        name: profile?.name || null,
+        bio: profile?.bio || null,
+      });
+
       setSelectedFile(null);
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
         setPreviewUrl(null);
       }
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de l'upload de l'avatar"
+      );
+      console.error(error);
+    } finally {
+      setIsUploadingAvatar(false);
     }
   };
 
@@ -171,7 +200,7 @@ export function AvatarUpload({
   const initials = userName?.[0]?.toUpperCase() || '?';
 
   return (
-    <>
+    <div className="max-w-2xl mx-auto">
       <Card className="bg-white/5 backdrop-blur-sm border-white/10">
         <CardHeader>
           <div className="space-y-3">
@@ -299,6 +328,6 @@ export function AvatarUpload({
           </div>
         </div>
       </CustomModal>
-    </>
+    </div>
   );
 }

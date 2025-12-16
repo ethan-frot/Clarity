@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { User, FileText } from 'lucide-react';
@@ -9,8 +9,6 @@ import { IconInput } from '@/components/app/common/IconInput';
 import { IconTextarea } from '@/components/app/common/IconTextarea';
 import { useUserProfile } from '@/module/user/hooks/useUserProfile';
 import { useUpdateProfile } from '@/module/user/hooks/useUpdateProfile';
-import { AvatarUpload } from '@/module/user/updateUserAvatar/ui/AvatarUpload';
-import { UserProfileCard } from '@/components/app/user/shared/UserProfileCard';
 
 interface UpdateProfileFormData {
   name: string;
@@ -20,13 +18,11 @@ interface UpdateProfileFormData {
 export function UpdateProfileForm() {
   const { data: profile, isLoading: isFetchingProfile } = useUserProfile();
   const updateProfileMutation = useUpdateProfile();
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const {
     register,
     handleSubmit,
     reset,
-    watch,
     formState: { errors },
   } = useForm<UpdateProfileFormData>({
     defaultValues: {
@@ -34,9 +30,6 @@ export function UpdateProfileForm() {
       bio: '',
     },
   });
-
-  const watchedName = watch('name');
-  const watchedBio = watch('bio');
 
   useEffect(() => {
     if (profile) {
@@ -46,40 +39,6 @@ export function UpdateProfileForm() {
       });
     }
   }, [profile, reset]);
-
-  const handleUploadAvatar = async (file: File) => {
-    setIsUploadingAvatar(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch('/api/users/profile/avatar', {
-        method: 'PATCH',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Erreur lors de l'upload");
-      }
-
-      toast.success('Avatar mis à jour avec succès !');
-
-      await updateProfileMutation.mutateAsync({
-        name: profile?.name || null,
-        bio: profile?.bio || null,
-      });
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Erreur lors de l'upload de l'avatar"
-      );
-      console.error(error);
-    } finally {
-      setIsUploadingAvatar(false);
-    }
-  };
 
   const onSubmit = async (data: UpdateProfileFormData) => {
     try {
@@ -112,14 +71,7 @@ export function UpdateProfileForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <UserProfileCard
-        name={watchedName || profile?.name || null}
-        avatar={profile?.avatar || null}
-        bio={watchedBio || profile?.bio || null}
-        isPreview
-      />
-
+    <div className="max-w-2xl mx-auto">
       <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
         <div className="space-y-3 mb-6">
           <h2 className="text-2xl font-bold text-white flex items-center gap-3">
@@ -177,13 +129,6 @@ export function UpdateProfileForm() {
           </div>
         </form>
       </div>
-
-      <AvatarUpload
-        currentAvatar={profile?.avatar}
-        userName={profile?.name}
-        onUpload={handleUploadAvatar}
-        isLoading={isUploadingAvatar}
-      />
     </div>
   );
 }
