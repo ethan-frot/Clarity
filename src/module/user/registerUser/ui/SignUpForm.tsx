@@ -22,15 +22,7 @@ interface SignUpFormData {
 }
 
 /**
- * Formulaire d'inscription (US-9)
- *
- * Permet à un utilisateur de créer un nouveau compte.
- * Après inscription réussie, redirige vers la page de connexion.
- *
- * Validation :
- * - Email : format RFC 5322, max 255 caractères
- * - Password : min 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre, 1 spécial
- * - Name : optionnel, max 100 caractères
+ * US-9 + US-17 : Inscription avec vérification email (OTP)
  */
 export function SignUpForm() {
   const router = useRouter();
@@ -57,10 +49,10 @@ export function SignUpForm() {
         return;
       }
 
-      toast.success('Compte créé avec succès');
+      toast.success('Compte créé ! Vérifiez votre email pour le code OTP.');
 
       setTimeout(() => {
-        router.push('/signin');
+        router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
       }, 1500);
     } catch (error) {
       console.error("Erreur lors de l'inscription:", error);
