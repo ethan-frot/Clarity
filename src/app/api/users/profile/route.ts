@@ -5,7 +5,7 @@ import { GetMyProfilePrismaRepository } from '@/module/user/getMyProfile/GetMyPr
 import { UpdateUserProfileUseCase } from '@/module/user/updateUserProfile/UpdateUserProfileUseCase';
 import { UpdateUserProfilePrismaRepository } from '@/module/user/updateUserProfile/UpdateUserProfilePrismaRepository';
 
-export async function GET() {
+export async function GET(_request: NextRequest) {
   try {
     const session = await getSession();
     if (!session?.user?.id) {
