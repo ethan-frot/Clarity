@@ -1,4 +1,5 @@
 import { UserContributions } from '@/module/user/getUserContributions/types/getUserContributions.types';
+import { UserProfileDTO } from '@/module/user/getMyProfile/types/getMyProfile.types';
 
 export async function fetchUserContributions(
   userId: string
@@ -8,6 +9,17 @@ export async function fetchUserContributions(
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.error || 'Erreur lors de la récupération');
+  }
+
+  return response.json();
+}
+
+export async function fetchUserProfile(): Promise<UserProfileDTO> {
+  const response = await fetch('/api/users/profile');
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Erreur lors de la récupération du profil');
   }
 
   return response.json();
