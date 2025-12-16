@@ -272,6 +272,45 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
 
 ---
 
+### US-9a: Ajouter une photo de profil lors de l'inscription
+
+**En tant que nouvel utilisateur,**
+**Je veux pouvoir ajouter une photo de profil pendant mon inscription,**
+**Afin de personnaliser mon compte dès le début**
+
+**Règles métier :**
+
+- **Optionnel** : utilisateur peut skip cette étape
+- Formats acceptés : JPEG, PNG, WebP
+- Taille maximum : 2 MB
+- **Rollback strict** : Si signup échoue après upload blob, supprimer le blob orphelin
+- Si utilisateur quitte le formulaire sans finir, supprimer blob temporaire
+- Upload vers Vercel Blob avec génération URL CDN
+
+**Scénarios :**
+
+- **Inscription avec avatar réussie**
+  - **Étant donné** qu'un nouvel utilisateur remplit le formulaire signup
+  - **Quand** il upload un avatar valide ET termine l'inscription
+  - **Alors** le compte est créé avec l'avatar stocké
+
+- **Inscription échouée - rollback avatar**
+  - **Étant donné** qu'un utilisateur a uploadé un avatar
+  - **Quand** l'inscription échoue (email déjà pris, erreur DB)
+  - **Alors** le blob uploadé est supprimé (rollback)
+
+- **Inscription sans avatar**
+  - **Étant donné** qu'un utilisateur skip l'étape avatar
+  - **Quand** il termine l'inscription
+  - **Alors** le compte est créé avec avatar = null
+
+- **Upload échoué - validation**
+  - **Étant donné** qu'un utilisateur tente d'uploader un avatar
+  - **Quand** le fichier est trop volumineux ou format invalide
+  - **Alors** une erreur 400 est retournée
+
+---
+
 ### US-10: Se connecter au forum (Sign In)
 
 **En tant qu'utilisateur enregistré,**
@@ -441,10 +480,10 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
 
 ---
 
-### US-15b: Upload avatar utilisateur
+### US-15b: Ajouter ou modifier sa photo de profil
 
 **En tant qu'utilisateur authentifié,**
-**Je veux pouvoir uploader une photo de profil (avatar),**
+**Je veux pouvoir ajouter ou remplacer ma photo de profil depuis les paramètres,**
 **Afin de personnaliser visuellement mon compte**
 
 **Règles métier :**
@@ -452,20 +491,33 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
 - L'utilisateur doit être authentifié
 - Formats acceptés : JPEG, PNG, WebP
 - Taille maximum : 2 MB
+- **Si avatar existe déjà** : supprimer l'ancien blob Vercel AVANT d'uploader le nouveau
+- **Si pas d'avatar** : créer nouveau blob
+- Rollback si échec (supprimer nouveau blob si échec DB)
 - Génération automatique d'une URL CDN après upload
 - Retourne 400 si validation échoue
 
 **Scénarios :**
 
-- **Upload réussi**
-  - **Étant donné** qu'un utilisateur est authentifié
+- **Upload initial réussi**
+  - **Étant donné** qu'un utilisateur n'a pas d'avatar
   - **Quand** il upload une image valide
-  - **Alors** l'image est uploadée et l'URL est stockée
+  - **Alors** l'image est uploadée sur Vercel Blob et l'URL est stockée
+
+- **Remplacement réussi**
+  - **Étant donné** qu'un utilisateur a déjà un avatar
+  - **Quand** il upload une nouvelle image valide
+  - **Alors** l'ancien blob est supprimé ET la nouvelle image est uploadée
 
 - **Upload échoué - validation**
   - **Étant donné** qu'un utilisateur est authentifié
   - **Quand** il upload un fichier trop volumineux ou format invalide
   - **Alors** une erreur 400 est retournée
+
+- **Remplacement échoué - rollback**
+  - **Étant donné** qu'un utilisateur a un avatar existant
+  - **Quand** l'upload du nouveau blob réussit MAIS l'update DB échoue
+  - **Alors** le nouveau blob est supprimé (rollback) et l'ancien avatar reste
 
 ---
 
@@ -501,6 +553,40 @@ Ce fichier contient toutes les User Stories du projet avec leurs règles métier
   - **Étant donné** qu'un utilisateur est authentifié
   - **Quand** il soumet un nouveau mot de passe invalide
   - **Alors** une erreur 400 est retournée
+
+---
+
+### US-15d: Supprimer sa photo de profil
+
+**En tant qu'utilisateur authentifié avec une photo de profil,**
+**Je veux pouvoir supprimer ma photo de profil,**
+**Afin de revenir à l'avatar par défaut (gravatar ou initiales)**
+
+**Règles métier :**
+
+- L'utilisateur doit être authentifié
+- L'utilisateur doit avoir un avatar (avatar !== null)
+- Supprime le blob de Vercel Blob
+- Met avatar à null en base de données
+- Transaction : si suppression blob échoue, ne pas mettre null en DB
+- Retourne 404 si utilisateur n'a pas d'avatar
+
+**Scénarios :**
+
+- **Suppression réussie**
+  - **Étant donné** qu'un utilisateur a un avatar
+  - **Quand** il supprime son avatar
+  - **Alors** le blob Vercel est supprimé ET avatar est mis à null en DB
+
+- **Suppression échouée - pas d'avatar**
+  - **Étant donné** qu'un utilisateur n'a pas d'avatar
+  - **Quand** il tente de supprimer son avatar
+  - **Alors** une erreur 404 est retournée
+
+- **Suppression échouée - rollback DB**
+  - **Étant donné** qu'un utilisateur a un avatar
+  - **Quand** la suppression du blob réussit MAIS l'update DB échoue
+  - **Alors** l'avatar reste en DB (on accepte le blob orphelin sur Vercel)
 
 ---
 
