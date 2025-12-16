@@ -19,7 +19,10 @@ export async function GET(_request: NextRequest) {
 
     return Response.json(profile, { status: 200 });
   } catch (error) {
-    console.error('Error fetching user profile:', error);
+    console.error(
+      'Erreur lors de la récupération du profil utilisateur:',
+      error
+    );
 
     if (error instanceof Error) {
       return Response.json({ error: error.message }, { status: 400 });
@@ -52,7 +55,10 @@ export async function PATCH(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error updating user profile:', error);
+    console.error(
+      'Erreur lors de la modification du profil utilisateur:',
+      error
+    );
 
     if (error instanceof Error) {
       return Response.json({ error: error.message }, { status: 400 });

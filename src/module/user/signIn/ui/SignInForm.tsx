@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { signIn } from '@/lib/auth/auth-client';
+import { translateAuthError } from '@/lib/auth/translateAuthError';
 import { toast } from 'sonner';
 import {
   EmailInput,
@@ -38,17 +39,6 @@ export function SignInForm() {
     return params.get('redirect') || '/';
   };
 
-  const isEmailNotVerifiedError = (errorMessage?: string) => {
-    if (!errorMessage) return false;
-    const errorLower = errorMessage.toLowerCase();
-    return (
-      errorLower.includes('not verified') ||
-      errorLower.includes('verify your email') ||
-      errorLower.includes('email verification') ||
-      errorLower.includes('vérif')
-    );
-  };
-
   const onSubmit = async (data: SignInFormData) => {
     setIsLoading(true);
 
@@ -59,17 +49,20 @@ export function SignInForm() {
       });
 
       if (result.error) {
-        if (isEmailNotVerifiedError(result.error.message)) {
-          toast.error(
-            'Vous devez vérifier votre adresse email avant de vous connecter'
-          );
+        const errorMessage = translateAuthError(result.error.message);
+
+        if (
+          errorMessage.includes('vérifier votre adresse email') ||
+          errorMessage.includes('vérifier votre email')
+        ) {
+          toast.error(errorMessage);
           setTimeout(() => {
             router.push(
               `/verify-email?email=${encodeURIComponent(data.email)}`
             );
           }, 1500);
         } else {
-          toast.error('Email ou mot de passe incorrect');
+          toast.error(errorMessage);
         }
         return;
       }

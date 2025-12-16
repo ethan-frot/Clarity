@@ -20,7 +20,10 @@ export async function GET(
 
     return Response.json(contributions, { status: 200 });
   } catch (error) {
-    console.error('Error fetching user contributions:', error);
+    console.error(
+      'Erreur lors de la récupération des contributions utilisateur:',
+      error
+    );
 
     if (error instanceof Error) {
       if (error.message.includes('Utilisateur non trouvé')) {

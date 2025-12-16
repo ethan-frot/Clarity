@@ -37,7 +37,7 @@ export async function PATCH(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error updating avatar:', error);
+    console.error("Erreur lors de la mise à jour de l'avatar:", error);
 
     if (error instanceof Error) {
       return Response.json({ error: error.message }, { status: 400 });

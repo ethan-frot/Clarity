@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { authClient } from '@/lib/auth/auth-client';
+import { translateAuthError } from '@/lib/auth/translateAuthError';
 import { EmailInput } from '@/components/app/common/form';
 import { GradientButton } from '@/components/app/common/GradientButton';
 
@@ -41,7 +42,7 @@ export function ForgotPasswordForm() {
       });
 
       if (result.error) {
-        toast.error(result.error.message || "Une erreur s'est produite.");
+        toast.error(translateAuthError(result.error.message));
         return;
       }
 

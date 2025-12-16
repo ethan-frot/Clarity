@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { signUp } from '@/lib/auth/auth-client';
+import { translateAuthError } from '@/lib/auth/translateAuthError';
 import { toast } from 'sonner';
 import {
   EmailInput,
@@ -45,7 +46,7 @@ export function SignUpForm() {
       });
 
       if (result.error) {
-        toast.error(result.error.message || 'Une erreur est survenue');
+        toast.error(translateAuthError(result.error.message));
         return;
       }
 

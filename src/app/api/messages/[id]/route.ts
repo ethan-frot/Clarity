@@ -42,7 +42,7 @@ export async function PATCH(
 
     return Response.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error('Error updating message:', error);
+    console.error('Erreur lors de la modification du message:', error);
 
     if (error instanceof Error) {
       if (error.message.includes('trouvé')) {
@@ -80,7 +80,7 @@ export async function DELETE(
 
     return Response.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error('Error deleting message:', error);
+    console.error('Erreur lors de la suppression du message:', error);
 
     if (error instanceof Error) {
       if (error.message.includes('trouvé')) {

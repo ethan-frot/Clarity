@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { authClient } from '@/lib/auth/auth-client';
+import { translateAuthError } from '@/lib/auth/translateAuthError';
 import { PasswordInput } from '@/components/app/common/form';
 import { GradientButton } from '@/components/app/common/GradientButton';
 
@@ -45,10 +46,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       });
 
       if (result.error) {
-        toast.error(
-          result.error.message ||
-            'Token invalide, expiré ou déjà utilisé. Veuillez faire une nouvelle demande.'
-        );
+        toast.error(translateAuthError(result.error.message));
         return;
       }
 

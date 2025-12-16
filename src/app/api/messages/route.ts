@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     return Response.json(result, { status: 201 });
   } catch (error) {
-    console.error('Error creating message:', error);
+    console.error('Erreur lors de la création du message:', error);
 
     if (error instanceof Error) {
       if (error.message.includes('conversation')) {
