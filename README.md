@@ -64,7 +64,7 @@ cp .env.example .env.local
 
 ```bash
 # Démarrer PostgreSQL
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 5. Initialiser la base de données
