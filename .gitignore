@@ -49,3 +49,6 @@ next-env.d.ts
 # IA settings
 /.claude
 CLAUDE.md
+
+# local settings
+.vscode/
