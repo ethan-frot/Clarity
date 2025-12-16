@@ -34,7 +34,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={`${satoshi.variable} font-sans antialiased`}>
+      <body
+        className={`${satoshi.variable} font-sans antialiased`}
+        suppressHydrationWarning
+      >
         <QueryClientProvider>
           <BackgroundLayout>
             <div className="fixed top-6 right-6 z-50">

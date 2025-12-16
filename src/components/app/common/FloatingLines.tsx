@@ -19,7 +19,7 @@
  * - Cleanup automatique des ressources Three.js
  */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Scene,
   OrthographicCamera,
@@ -390,6 +390,7 @@ export default function FloatingLines({
   parallaxStrength = 0.2,
   mixBlendMode = 'screen',
 }: FloatingLinesProps) {
+  const [isMounted, setIsMounted] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const targetMouseRef = useRef<Vector2>(new Vector2(-1000, -1000));
   const currentMouseRef = useRef<Vector2>(new Vector2(-1000, -1000));
@@ -397,6 +398,11 @@ export default function FloatingLines({
   const currentInfluenceRef = useRef<number>(0);
   const targetParallaxRef = useRef<Vector2>(new Vector2(0, 0));
   const currentParallaxRef = useRef<Vector2>(new Vector2(0, 0));
+
+  // S'assurer que le composant s'initialise uniquement côté client
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   /**
    * Helper pour récupérer le nombre de lignes d'un groupe spécifique
@@ -439,7 +445,7 @@ export default function FloatingLines({
     : 0.01;
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!isMounted || !containerRef.current) return;
 
     // ==================== INITIALISATION THREE.JS ====================
 
@@ -668,6 +674,7 @@ export default function FloatingLines({
       }
     };
   }, [
+    isMounted,
     linesGradient,
     enabledWaves,
     lineCount,
@@ -683,6 +690,19 @@ export default function FloatingLines({
     parallax,
     parallaxStrength,
   ]);
+
+  // Ne rien rendre côté serveur pour éviter l'hydration mismatch
+  if (!isMounted) {
+    return (
+      <div
+        className="w-full h-full relative overflow-hidden floating-lines-container"
+        style={{
+          mixBlendMode: mixBlendMode,
+          backgroundColor: 'transparent',
+        }}
+      />
+    );
+  }
 
   return (
     <div
